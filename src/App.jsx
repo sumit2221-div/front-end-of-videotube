@@ -1,16 +1,15 @@
 import React from 'react'
-import './App.css'
+import Header from './components/header'
+import Sidebar from './components/slidebar'
 
 function App() {
-  
   return (
-    <>
-    
-    
-  <Videos/>
-  </>
-    
-
+    <div>
+      <Header/>
+      <outlet/>
+      <Sidebar/>
+      
+    </div>
   )
 }
 
