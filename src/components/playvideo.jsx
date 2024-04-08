@@ -1,41 +1,104 @@
-// VideoPlayer.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike } from "react-icons/ai";
+import CommentList from './Commentlist';
 
 const VideoPlayer = () => {
   const [video, setVideo] = useState(null);
-  const { id } = useParams();
   const [owner, setOwner] = useState(null);
-
-  console.log('ID:', id); // Log the value of id to see if it's undefined
+  const [liked, setLiked] = useState(false); // State to track liked status
+  const [disliked, setDisliked] = useState(false); // State to track disliked status
+  const { id } = useParams();
+  const [comments, setComments] = useState([]); // State to store comments
+  const [newComment, setNewComment] = useState("");
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const accessToken = localStorage.getItem('accessToken');
+  const userAvatar = localStorage.getItem('userAvatar'); // Get the avatar of the logged-in user
 
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.get(`http://localhost:4000/api/v1/video/${id}`, {
+        const videoResponse = await axios.get(`http://localhost:4000/api/v1/video/${id}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
         });
-        setVideo(response.data.data);
-        const ownerResponse = await axios.get(`http://localhost:4000/api/v1/users/${response.data.data.owner}`, {
+        setVideo(videoResponse.data.data);
+
+        const ownerResponse = await axios.get(`http://localhost:4000/api/v1/users/${videoResponse.data.data.owner}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
         });
         setOwner(ownerResponse.data.data);
-        console.log(ownerResponse.data);
-        console.log(response.data.data.owner)
+
+        // Fetch comments for the video
+        const commentsResponse = await axios.get(`http://localhost:4000/api/v1/comment/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+        setComments(commentsResponse.data.data.comments);
       } catch (error) {
         console.error('Error fetching video:', error);
       }
     };
 
     fetchVideo();
-  }, [id]);
+  }, [id, accessToken, liked]);
 
+  const handleLikeToggle = async () => {
+    try {
+      const response = await axios.post(`http://localhost:4000/api/v1/like/toggle/v/${id}`, {}, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      if (response.status === 200) {
+        setLiked(!liked);
+        setDisliked(false); // Ensure that only one of like/dislike can be selected
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
+
+  const handleDislikeToggle = async () => {
+    try {
+      const response = await axios.post(`http://localhost:4000/api/v1/like/toggle/v/${id}`, {}, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      if (response.status === 200) {
+        setDisliked(!disliked);
+        setLiked(false); // Ensure that only one of like/dislike can be selected
+      }
+    } catch (error) {
+      console.error('Error toggling dislike:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/comment/${id}`,
+        { content: newComment },
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  };
+  
   if (!video || !owner) {
     return <div>Loading...</div>;
   }
@@ -49,18 +112,46 @@ const VideoPlayer = () => {
       <div className='h-[100px] w-[900px] bg-transparent relative left-8 rounded-xl'>
         <h1 className='text-2xl text-white'>{video.title}</h1>
         {owner && (
-          <React.Fragment>
-            <div className='flex gap-2'>
-           
+          <div className='flex items-center gap-2'>
             <img className='h-[40px] w-[40px] rounded-full' src={owner.avatar} alt={owner.username} />
             <h1 className='text-white'>{owner.username}</h1>
-            <button className=''></button>
-            <button></button>
-            <button></button>
-            <button></button>
-            </div>
-          </React.Fragment>
+          </div>
         )}
+        <div className='absolute right-0 flex gap-3 mt-3 top-3'>
+          <button className={`flex items-center justify-center w-24 h-10 rounded-md focus:outline-none ${liked ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`} onClick={handleLikeToggle} disabled={liked}>
+            {liked ? <AiFillLike className='mr-1' /> : <AiOutlineLike className='mr-1' />} Like <span>{video.likes}</span>
+          </button>
+          <button className={`flex items-center justify-center w-24 h-10 rounded-md focus:outline-none ${disliked ? 'bg-red-500 text-white' : 'bg-gray-300 text-gray-700'}`} onClick={handleDislikeToggle} disabled={!liked}>
+            {disliked ? <AiFillDislike className='mr-1' /> : <AiOutlineDislike className='mr-1' />} Dislike
+          </button>
+        </div>
+        <div className='h-[100px] w-[900px] bg-gray-700 rounded-xl'>
+          <h1>{video.views} views</h1>
+          <div>
+            <p>{video.description}</p>
+            <button onClick={() => setShowDescription(!showDescription)} className="text-white">{showDescription ? "Show Less" : "Show More"}</button>
+          </div>
+        </div>
+
+        <div>
+          <form className='h-[100px] w-[900px] rounded-xl flex' onSubmit={handleSubmit}>
+            <div className="flex items-center w-full">
+              <img src={userAvatar} className='h-[50px] w-[50px] rounded-full' /> {/* Display logged-in user's avatar */}
+              <input
+                className='w-[800px] h-[50px] bg-transparent border-b text-white mb-2 outline-none focus:ring-0'
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder='Add a comment...'
+                onFocus={() => setIsInputFocused(true)}
+              />
+              {isInputFocused && (
+                <button className="h-[40px] w-[50px] text-white rounded-xl bg-blue-500 shadow-xl" type="submit">Submit</button>
+              )}
+            </div>
+          </form>
+          {/* Pass comments array to CommentList component */}
+          <CommentList comments={comments} />
+        </div>
       </div>
     </div>
   );

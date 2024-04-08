@@ -14,7 +14,7 @@ const Home = () => {
         const response = await axios.get(`http://localhost:4000/api/v1/video`, {
           params: {
             page: currentPage,
-            limit: 10 // Adjust the limit as needed
+            limit: 12 // Adjust the limit as needed
           },
           headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -39,6 +39,7 @@ const Home = () => {
 
         setVideos(videosWithOwnerData);
         setTotalPages(response.data.data.totalPages);
+        console.log(videosWithOwnerData)
       
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -63,7 +64,7 @@ const Home = () => {
   };
 
   return (
-    <div className="container px-4 py-8 mx-10 mt-10">
+    <div className="container h-auto gap-10 px-4 py-8 mx-10 mt-10">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {videos.map(video => (
           <div key={video.id}>
