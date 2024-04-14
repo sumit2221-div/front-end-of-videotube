@@ -16,18 +16,16 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:4000/api/v1/users/login', {
+      const response = await axios.post('https://backend-of-videotube.onrender.com/api/v1/users/login', {
         email,
         password,
       });
-      const { accessToken} = response.data.data;
+      const { accessToken } = response.data;
       // Store the access token in local storage
       localStorage.setItem('accessToken', accessToken);
 
       // Dispatch authlogin action with email and access token
-      dispatch(authLogin({ email,password }));
-
-      
+      dispatch(authLogin({ email, password }));
 
       if (response.data) {
         console.log(response.data)
@@ -35,8 +33,8 @@ const Login = () => {
       }
 
     } catch (error) {
-      console.log(error)
-      setError(error.message.error);
+      console.error(error);
+      setError(error.response.data.message); // Assuming error message is returned in response
     }
   };
 
@@ -66,7 +64,7 @@ const Login = () => {
           className="font-medium transition-all duration-200 text-primary hover:underline"
         >
           sign in
-                </Link>
+        </Link>
       </p>
 
       <button className='h-[50px] w-[100px] bg-slate-800 rounded-xl box-shadow-sm' type="submit">Login</button>

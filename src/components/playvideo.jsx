@@ -15,7 +15,9 @@ const VideoPlayer = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const accessToken = localStorage.getItem('accessToken');
-  const userAvatar = localStorage.getItem('userAvatar'); // Get the avatar of the logged-in user
+  const [useravatar, setUserAvatar] = useState(null)
+  const [likes , setlikes] = useState(null)
+  const [dislikes , setDislikes] = useState(null)
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -26,6 +28,7 @@ const VideoPlayer = () => {
           }
         });
         setVideo(videoResponse.data.data);
+        console.log(videoResponse.data.data)
 
         const ownerResponse = await axios.get(`http://localhost:4000/api/v1/users/${videoResponse.data.data.owner}`, {
           headers: {
@@ -41,12 +44,35 @@ const VideoPlayer = () => {
           }
         });
         setComments(commentsResponse.data.data.comments);
+      
+            
+              
+              const response = await axios.get('http://localhost:4000/api/v1/users/current-user', {
+                headers: {
+                  'Authorization': `Bearer ${accessToken}`
+                }
+              });
+              setUserAvatar(response.data.data.avatar);
+
+              console.log("User fetched successfully");
+
+              const LikeRes = await axios.get(`http://localhost:4000/api/v1/like/${id}`,{
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
+              }
+      })
+      setlikes(LikeRes.data.data.likes)
+      setDislikes(LikeRes.data.data.dislikes)
+      console.log(LikeRes.data.data)
+    
+
       } catch (error) {
         console.error('Error fetching video:', error);
       }
     };
 
     fetchVideo();
+
   }, [id, accessToken, liked]);
 
   const handleLikeToggle = async () => {
@@ -58,8 +84,10 @@ const VideoPlayer = () => {
       });
       if (response.status === 200) {
         setLiked(!liked);
-        setDisliked(false); // Ensure that only one of like/dislike can be selected
+        setDisliked(false); 
+        // Ensure that only one of like/dislike can be selected
       }
+      console.log(response.data)
     } catch (error) {
       console.error('Error toggling like:', error);
     }
@@ -104,7 +132,7 @@ const VideoPlayer = () => {
   }
 
   return (
-    <div className='flex flex-col w-full h-auto gap-5 mx-12 mt-12 rounded-xl'>
+    <div className='flex flex-col w-full h-auto gap-5 mx-12 rounded-xl'>
       <video className='h-[500px] w-[900px] rounded-2xl  relative top-4 left-8  bg-gray-600 object-cover' controls>
         <source src={video.videofile} />
         Your browser does not support the video tag.
@@ -119,24 +147,24 @@ const VideoPlayer = () => {
         )}
         <div className='absolute right-0 flex gap-3 mt-3 top-3'>
           <button className={`flex items-center justify-center w-24 h-10 rounded-md focus:outline-none ${liked ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`} onClick={handleLikeToggle} disabled={liked}>
-            {liked ? <AiFillLike className='mr-1' /> : <AiOutlineLike className='mr-1' />} Like <span>{video.likes}</span>
+            {liked ? <AiFillLike className='mr-1' /> : <AiOutlineLike className='mr-1' />} Like <span>{likes}</span>
           </button>
           <button className={`flex items-center justify-center w-24 h-10 rounded-md focus:outline-none ${disliked ? 'bg-red-500 text-white' : 'bg-gray-300 text-gray-700'}`} onClick={handleDislikeToggle} disabled={!liked}>
-            {disliked ? <AiFillDislike className='mr-1' /> : <AiOutlineDislike className='mr-1' />} Dislike
+            {disliked ? <AiFillDislike className='mr-1' /> : <AiOutlineDislike className='mr-1' />} Dislike  <span>{dislikes}</span>
           </button>
         </div>
-        <div className='h-[100px] w-[900px] bg-gray-700 rounded-xl'>
+        <div className='h-[100px] w-[900px] bg-gray-900 text-white rounded-xl'>
           <h1>{video.views} views</h1>
           <div>
             <p>{video.description}</p>
-            <button onClick={() => setShowDescription(!showDescription)} className="text-white">{showDescription ? "Show Less" : "Show More"}</button>
+            <button onClick={() => setShowDescription(!showDescription)} className="relative mt-8 text-white">{showDescription ? "Show Less" : "Show More"}</button>
           </div>
         </div>
 
         <div>
           <form className='h-[100px] w-[900px] rounded-xl flex' onSubmit={handleSubmit}>
             <div className="flex items-center w-full">
-              <img src={userAvatar} className='h-[50px] w-[50px] rounded-full' /> {/* Display logged-in user's avatar */}
+              <img src={useravatar} className='h-[40px] w-[40px] rounded-full' /> {/* Display logged-in user's avatar */}
               <input
                 className='w-[800px] h-[50px] bg-transparent border-b text-white mb-2 outline-none focus:ring-0'
                 value={newComment}

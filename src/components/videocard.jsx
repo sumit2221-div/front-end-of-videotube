@@ -29,7 +29,7 @@ const VideoCard = ({ video }) => {
 
   return (
     <Link to={`video/${video._id}`}>
-      <div className=" bg-black rounded-lg shadow-lg w-[400px] flex flex-wrap">
+      <div className=" bg-transparent rounded-lg  w-[400px] flex flex-wrap">
         <img className="object-cover object-center w-full h-[200px] rounded-xl" src={video.thumbnail} alt={video.title} />
         <div className="w-full p-4 text-white bg-transparent  h-[90px]">
           <img className="h-[50px] w-[50px] rounded-full" src={video.owner.avatar} alt={video.owner.username} />

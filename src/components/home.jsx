@@ -2,60 +2,57 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import VideoCard from "./videocard";
 
-const Home = () => {
+const Home = ({ searchQuery }) => {
   const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const accessToken = localStorage.getItem('accessToken');
 
   useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const response = await axios.get(`http://localhost:4000/api/v1/video`, {
-          params: {
-            page: currentPage,
-            limit: 12 // Adjust the limit as needed
-          },
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });
-
-        const videosWithOwnerData = await Promise.all(response.data.data.videos.map(async (video) => {
-          try {
-            const ownerResponse = await axios.get(`http://localhost:4000/api/v1/users/${video.owner}`, {
-              headers: {
-                'Authorization': `Bearer ${accessToken}`
-              }
-            });
-            const ownerData = ownerResponse.data.data;
-            return { ...video, owner: ownerData };
-          } catch (error) {
-            console.error(`Error fetching owner data for video ${video.id}:`, error);
-            // Return the video without owner data if fetching owner data fails
-            return video;
-          }
-        }));
-
-        setVideos(videosWithOwnerData);
-        setTotalPages(response.data.data.totalPages);
-        console.log(videosWithOwnerData)
-      
-      } catch (error) {
-        console.error('Error fetching videos:', error);
-      }
-    };
-
     fetchVideos();
-  }, [accessToken, currentPage]);
+  }, [searchQuery, currentPage]); // Fetch videos when currentPage or searchQuery changes
 
-  const handleNextPage = () => {
+  const fetchVideos = async () => {
+    try {
+      const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/video`, {
+        params: {
+          page: currentPage,
+          limit: 12,
+          search: searchQuery // Include search query parameter
+        },
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
   
+      const videosWithOwnerData = await Promise.all(response.data.data.videos.map(async (video) => {
+        try {
+          const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${video.owner}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+          const ownerData = ownerResponse.data.data;
+          return { ...video, owner: ownerData };
+        } catch (error) {
+          console.error(`Error fetching owner data for video ${video.id}:`, error);
+          // Return the video without owner data if fetching owner data fails
+          return video;
+        }
+      }));
+  
+      setVideos(videosWithOwnerData);
+      setTotalPages(response.data.data.totalPages);
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+    }
+  };
+  
+  const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
-  
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -64,7 +61,8 @@ const Home = () => {
   };
 
   return (
-    <div className="container h-auto gap-10 px-4 py-8 mx-10 mt-10">
+    <div className="container h-auto gap-10 px-4 py-4 mx-10 ">
+      
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {videos.map(video => (
           <div key={video.id}>

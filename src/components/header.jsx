@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LOGO from "../assets/LGO.png";
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import LogoutButton from './logout';
-import { useEffect } from 'react';
 import axios from 'axios';
-import { MdVideoLibrary, MdHome, MdLogin } from 'react-icons/md';
+import { MdVideoLibrary, MdHome, MdLogin , MdOutlineWebAsset} from 'react-icons/md';
+const Header = ({ onSearch }) => {
+  const [query, setQuery] = useState("");
 
-function Header() {
-  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const isLoggedIn = localStorage.getItem('accessToken');
   const navigate = useNavigate();
-  const [useravatar, setUserAvatar] = useState('');
+  const [userAvatar, setUserAvatar] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
+
 
   const navItems = [
     {
@@ -26,7 +27,12 @@ function Header() {
       slug: "/PublishVideo",
       active: isLoggedIn,
     },
-    
+    {
+      icon : <MdOutlineWebAsset/>,
+      text : "text",
+      slug : "/tweet",
+      active : isLoggedIn
+    }
   ];
 
   useEffect(() => {
@@ -41,6 +47,7 @@ function Header() {
           });
           setUserAvatar(response.data.data);
           console.log("User fetched successfully");
+          console.log(accessToken)
         }
       } catch (error) {
         console.error('Error fetching user avatar:', error);
@@ -51,28 +58,44 @@ function Header() {
   }, [isLoggedIn, localStorage.getItem('accessToken')]);
 
   const handleGetUserChannel = async () => {
-   
-    const username = useravatar.username; // Assuming username is available in useravatar
+    const username = userAvatar.username; // Assuming username is available in userAvatar
     navigate(`/user/c/${username}`);
   };
 
-
+  
+    const handleSearchInputChange = (event) => {
+      setQuery(event.target.value);
+    };
+  
+    const handleSearchSubmit = (event) => {
+      event.preventDefault();
+      onSearch(query);
+    };
+  
   return (
-    <div className='h-[50px] w-full absolute bg-gray-900 box-shadow-xl shadow-white top-0'>
-      <img src={LOGO} className='h-[60px] w-[100px] relative left-7 bg-transparent' />
-      <h1 className='absolute text-2xl text-white left-[8%] top-5 font-sans'>Videotube</h1>
-      <div className='w-[400px] absolute top-3 left-[30%] flex gap-3'>
-        <input type="search" id="default-search" className="block w-[300px] p-2 rounded-xl ps-10 text-sm text-gray-900 border border-gray-300 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search videos......" required />
-        <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+    <div className='flex flex-wrap items-center justify-between w-full px-4 py-4 bg-gray-900 shadow-xl '>
+      <div className='flex items-center'>
+        <img src={LOGO} className='w-10 h-10 mr-2' alt="Logo" />
+        <h1 className='text-xl font-semibold text-white'>Videotube</h1>
       </div>
-
-      <ul className='h-[50px] w-[100px] bg-transparent absolute top-0 left-[80%] rounded-xl text-center flex gap-5'>
+      <form onSubmit={handleSearchSubmit} className='flex items-center'>
+        <input
+          type="search"
+          value={query}
+          onChange={handleSearchInputChange}
+          className="block w-full px-4 py-2 text-sm text-gray-900 border border-gray-300 rounded-md md:w-72 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Search videos..."
+          required
+        />
+        <button type="submit" className="px-4 py-2 ml-2 text-sm font-medium text-white bg-blue-700 rounded-md hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">Search</button>
+      </form>
+      <ul className='flex items-center space-x-5'>
         {navItems.map((item) =>
           item.active ? (
             <li key={item.text}>
               <button
                 onClick={() => navigate(item.slug)}
-                className='relative py-4 text-3xl text-white duration-200 rounded-full left-28 px-11 inline-bock hover:text-slate-300'
+                className='text-2xl text-white duration-200 hover:text-gray-300'
               >
                 {item.icon}
               </button>
@@ -81,24 +104,18 @@ function Header() {
         )}
         {isLoggedIn && (
           <li>
-            <div className="relative">
-              <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className='h-[40px] w-[40px] rounded-full relative top-3 left-32'>
-                <img src={useravatar.avatar} className='rounded-full h-[40px] w-[40px]' />
-              </button>
-              {/* Dropdown menu */}
-              {isDropdownOpen && (
-                <div className="h-[200px] w-[150px] bg-slate-900 rounded-xl text-white top-2 absolute flex flex-col gap-5 left-1 right-0">
-                <button onClick={() => {
-  handleGetUserChannel();
-  setIsDropdownOpen(false);
-}} className='text-white'>
-  view channel
-</button>
-                  
-                  <LogoutButton />
-                </div>
-              )}
-            </div>
+            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className='relative'>
+              <img src={userAvatar.avatar} className='w-8 h-8 rounded-full' alt="User Avatar" />
+              {/* Dropdown arrow */}
+              <svg className="absolute top-0 right-0 w-4 h-4 -mt-1 -mr-1 text-white fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 7l5 5 5-5z" /></svg>
+            </button>
+            {/* Dropdown menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 w-48 py-1 mt-2 bg-gray-800 rounded-md shadow-lg ">
+                <button onClick={() => { handleGetUserChannel(); setIsDropdownOpen(false); }} className='block w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-700'>View Channel</button>
+                <LogoutButton />
+              </div>
+            )}
           </li>
         )}
       </ul>
