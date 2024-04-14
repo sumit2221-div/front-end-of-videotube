@@ -14,7 +14,7 @@ import CreateTweet from './components/tweet.jsx';
 import Tweets from "./components/tweets"
 
 const App = () => {
-  const isLoggedIn = useSelector(state => state.isLoggedIn) || localStorage.getItem('accessToken');
+  const isLoggedIn = useSelector(state => state.isLoggedIn)  || sessionStorage.getItem('accessToken')
 
  
   return (

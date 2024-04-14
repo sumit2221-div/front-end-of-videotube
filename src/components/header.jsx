@@ -8,7 +8,7 @@ import { MdVideoLibrary, MdHome, MdLogin , MdOutlineWebAsset} from 'react-icons/
 const Header = ({ onSearch }) => {
   const [query, setQuery] = useState("");
 
-  const isLoggedIn = localStorage.getItem('accessToken');
+  const isLoggedIn = sessionStorage.getItem('accessToken');
   const navigate = useNavigate();
   const [userAvatar, setUserAvatar] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
@@ -39,7 +39,7 @@ const Header = ({ onSearch }) => {
     const fetchUserAvatar = async () => {
       try {
         if (isLoggedIn) {
-          const accessToken = localStorage.getItem('accessToken');
+          const accessToken = sessionStorage.getItem('accessToken');
           const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
             headers: {
               'Authorization': `Bearer ${accessToken}`
@@ -55,7 +55,7 @@ const Header = ({ onSearch }) => {
     };
 
     fetchUserAvatar();
-  }, [isLoggedIn, localStorage.getItem('accessToken')]);
+  }, [isLoggedIn, sessionStorage.getItem('accessToken')]);
 
   const handleGetUserChannel = async () => {
     const username = userAvatar.username; // Assuming username is available in userAvatar

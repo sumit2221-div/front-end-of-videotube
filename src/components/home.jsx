@@ -15,6 +15,7 @@ const Home = ({ searchQuery }) => {
 
   const fetchVideos = async () => {
     try {
+      const accessToken =  sessionStorage.getItem('accessToken')
       const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/video`, {
         params: {
           page: currentPage,
@@ -22,18 +23,22 @@ const Home = ({ searchQuery }) => {
           search: searchQuery
         },
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization':  `Bearer ${accessToken}`
+        
         }
       });
+    
 
       const videosWithOwnerData = await Promise.all(response.data.data.videos.map(async (video) => {
         try {
           const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${video.owner}`, {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+              'Authorization':  `Bearer ${accessToken}`
+            
             }
           });
           const ownerData = ownerResponse.data.data;
+          
           return { ...video, owner: ownerData };
         } catch (error) {
           console.error(`Error fetching owner data for video ${video.id}:`, error);
@@ -43,9 +48,12 @@ const Home = ({ searchQuery }) => {
 
       setVideos(videosWithOwnerData);
       setTotalPages(response.data.data.totalPages);
+    
+    
     } catch (error) {
       console.error('Error fetching videos:', error);
       setError('Failed to fetch videos. Please try again later.'); // Set error message
+  
     }
   };
 

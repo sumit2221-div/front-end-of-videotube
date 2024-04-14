@@ -26,7 +26,7 @@ const Tweets = () => {
     setLoading(true);
 
     try {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = sessionStorage.getItem('accessToken');
       const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/tweets/`, {
         params: {
           page : 1,

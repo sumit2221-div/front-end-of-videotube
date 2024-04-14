@@ -9,7 +9,7 @@ function UserChannelPage() {
   useEffect(() => {
     const fetchChannelData = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken');
+        const accessToken = sessionStorage.getItem('accessToken');
         const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/c/${username}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`

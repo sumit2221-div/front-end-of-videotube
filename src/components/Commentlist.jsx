@@ -15,7 +15,7 @@ const CommentList = ({ comments }) => {
           uniqueOwnerIds.map(ownerId =>
             axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${ownerId}`, {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`,
               },
             })
           )

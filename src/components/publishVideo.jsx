@@ -11,7 +11,7 @@ const PublishVideo = () => {
   const [loading, setLoading] = useState(false); // State for loading indicator
 
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = sessionStorage.getItem('accessToken');
 
   const handleSubmit = async (e) => {
     e.preventDefault();

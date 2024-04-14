@@ -10,7 +10,7 @@ const LogoutButton = () => {
 
   const handleLogout = async () => {
     try {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = sessionStorage.getItem('accessToken');
       const response = await axios.post(
         'https://backend-of-videotube.onrender.com/api/v1/users/logout',
         null, // No data payload

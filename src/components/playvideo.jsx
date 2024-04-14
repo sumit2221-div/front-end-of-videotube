@@ -14,7 +14,7 @@ const VideoPlayer = () => {
   const [newComment, setNewComment] = useState("");
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = sessionStorage.getItem('accessToken');
   const [useravatar, setUserAvatar] = useState(null)
   const [likes , setlikes] = useState(null)
   const [dislikes , setDislikes] = useState(null)

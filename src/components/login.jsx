@@ -20,16 +20,18 @@ const Login = () => {
         email,
         password,
       });
-      const { accessToken } = response.data;
+      const {  accessToken } = response.data.data;
       // Store the access token in local storage
-      localStorage.setItem('accessToken', accessToken);
-
+    sessionStorage.setItem('accessToken', accessToken);
+      
       // Dispatch authlogin action with email and access token
       dispatch(authLogin({ email, password }));
 
       if (response.data) {
         console.log(response.data)
         navigate("/");
+        console.log(sessionStorage.getItem('accessToken'));
+
       }
 
     } catch (error) {
