@@ -22,7 +22,7 @@ const VideoPlayer = () => {
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const videoResponse = await axios.get(`http://localhost:4000/api/v1/video/${id}`, {
+        const videoResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/video/${id}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
@@ -30,7 +30,7 @@ const VideoPlayer = () => {
         setVideo(videoResponse.data.data);
         console.log(videoResponse.data.data)
 
-        const ownerResponse = await axios.get(`http://localhost:4000/api/v1/users/${videoResponse.data.data.owner}`, {
+        const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${videoResponse.data.data.owner}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
@@ -38,7 +38,7 @@ const VideoPlayer = () => {
         setOwner(ownerResponse.data.data);
 
         // Fetch comments for the video
-        const commentsResponse = await axios.get(`http://localhost:4000/api/v1/comment/${id}`, {
+        const commentsResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/comment/${id}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
@@ -47,7 +47,7 @@ const VideoPlayer = () => {
       
             
               
-              const response = await axios.get('http://localhost:4000/api/v1/users/current-user', {
+              const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
                 headers: {
                   'Authorization': `Bearer ${accessToken}`
                 }
@@ -56,7 +56,7 @@ const VideoPlayer = () => {
 
               console.log("User fetched successfully");
 
-              const LikeRes = await axios.get(`http://localhost:4000/api/v1/like/${id}`,{
+              const LikeRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/like/${id}`,{
               headers: {
                 'Authorization': `Bearer ${accessToken}`
               }
@@ -77,7 +77,7 @@ const VideoPlayer = () => {
 
   const handleLikeToggle = async () => {
     try {
-      const response = await axios.post(`http://localhost:4000/api/v1/like/toggle/v/${id}`, {}, {
+      const response = await axios.post(`https://backend-of-videotube.onrender.com/api/v1/like/toggle/v/${id}`, {}, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
@@ -95,7 +95,7 @@ const VideoPlayer = () => {
 
   const handleDislikeToggle = async () => {
     try {
-      const response = await axios.post(`http://localhost:4000/api/v1/like/toggle/v/${id}`, {}, {
+      const response = await axios.post(`https://backend-of-videotube.onrender.com/api/v1/like/toggle/v/${id}`, {}, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
@@ -113,7 +113,7 @@ const VideoPlayer = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/v1/comment/${id}`,
+        `https://backend-of-videotube.onrender.com/api/v1/comment/${id}`,
         { content: newComment },
         {
           headers: {

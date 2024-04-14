@@ -23,7 +23,7 @@ function CreateTweet() {
       formData.append('picture', picture);
   
       const accessToken = localStorage.getItem('accessToken');
-      const response = await axios.post('http://localhost:4000/api/v1/tweets', formData, { // Removed body from Axios post method
+      const response = await axios.post('https://backend-of-videotube.onrender.com/api/v1/tweets', formData, { // Removed body from Axios post method
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }

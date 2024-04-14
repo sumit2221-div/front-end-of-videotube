@@ -40,7 +40,7 @@ const Header = ({ onSearch }) => {
       try {
         if (isLoggedIn) {
           const accessToken = localStorage.getItem('accessToken');
-          const response = await axios.get('http://localhost:4000/api/v1/users/current-user', {
+          const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
             headers: {
               'Authorization': `Bearer ${accessToken}`
             }

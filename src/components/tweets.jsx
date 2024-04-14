@@ -27,7 +27,7 @@ const Tweets = () => {
 
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const response = await axios.get(`http://localhost:4000/api/v1/tweets/`, {
+      const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/tweets/`, {
         params: {
           page : 1,
           limit: 1 // Load only one tweet per page

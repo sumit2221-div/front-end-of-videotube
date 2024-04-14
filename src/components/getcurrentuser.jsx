@@ -15,7 +15,7 @@ function Profile() {
       try {
         // Make a GET request to the backend endpoint to fetch current user data
         
-        const response = await axios.get('http://localhost:4000/api/v1/users/current-user', {
+        const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
         
          headers: {
             Authorization: `Bearer ${accessToken}`,

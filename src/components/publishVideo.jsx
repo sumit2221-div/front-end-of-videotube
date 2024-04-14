@@ -29,7 +29,7 @@ const PublishVideo = () => {
       formData.append('thumbnail', thumbnail);
       formData.append('videofile', videofile);
 
-      const response = await axios.post('http://localhost:4000/api/v1/video', formData, {
+      const response = await axios.post('https://backend-of-videotube.onrender.com/api/v1/video', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${accessToken}`

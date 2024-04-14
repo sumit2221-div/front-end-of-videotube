@@ -16,24 +16,7 @@ import Tweets from "./components/tweets"
 const App = () => {
   const isLoggedIn = useSelector(state => state.isLoggedIn) || localStorage.getItem('accessToken');
 
-  useEffect(() => {
-    // Check if access token is expired
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      try {
-        const accessTokenData = jwtDecode(accessToken);
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (accessTokenData.exp < currentTime) {
-          // Token is expired, clear local storage and redirect to login
-          localStorage.removeItem('accessToken');
-        }
-      } catch (error) {
-        console.error('Error decoding access token:', error);
-        // Handle decoding error (e.g., token is malformed)
-      }
-    }
-  }, []);
-
+ 
   return (
     <div>
       <Box>
