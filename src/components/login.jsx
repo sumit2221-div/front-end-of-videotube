@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+jiimport React, { useState } from 'react';
 import axios from 'axios';
 import { login as authLogin } from '../store/authslice';
 import { useDispatch } from 'react-redux';
@@ -60,7 +60,7 @@ const Login = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <p className="mt-2 text-base text-center text-white">
-        Already have an account?&nbsp;
+        new user?&nbsp;
         <Link
           to="/Registration"
           className="font-medium transition-all duration-200 text-primary hover:underline"
