@@ -25,7 +25,7 @@ const LogoutButton = () => {
       dispatch(logout());
 
       // Remove access token from local storage
-      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('accessToken');
 
       if (response.status === 200) {
         // Redirect to login page

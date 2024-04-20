@@ -30,20 +30,38 @@ function UserChannelPage() {
   }
 
   return (
-    <div className='w-full h-auto mx-10 mt-10 bg-transparent ring-4'>
+    <div className='flex w-auto h-lvh '>
+    
+      
+    <div className='w-auto mx-10 bg-transparent  '>
       <img src={channelData.avatar} className='h-[200px] w-[200px] rounded-full relative top-5 left-5' alt={channelData.fullName} />
-      <h1 className='absolute font-serif text-5xl text-white left-[20%] top-[10%]'>{channelData.fullName}</h1>
-      <div className='flex flex-row relative left-[18%] gap-4 bottom-24 '>
-        <h3 className='text-xl text-white '>{channelData.username}</h3>
-        <span className='text-white '>Video:{channelData.uploadedVideosCount}</span>
+    
+      
       </div>
-      <div className='relative flex gap-5 left-56 bottom-20'>
+      <div className='relative gap-5 flex flex-col  h-[300px] '>
+      <h1 className='font-serif text-5xl text-white '>{channelData.fullName}</h1>
+    
+      <h3 className='text-xl text-white'>
+  {channelData.username} <span className='text-white'>Video: {channelData.uploadedVideosCount}</span>
+</h3>
+<div  className='flex gap-5'>
+
+      
         <button className=' text-white h-[40px] w-[150px] bg-gray-800 rounded-xl'>update detail</button>
         <button className='h-[40px] w-[150px] bg-gray-800 rounded-xl text-white'>create playlist</button>
+        </div>
+        <h3 className='text-xl text-white'>subscriber {channelData.subscribersCount}</h3>
+
+
       </div>
+      
+
+    
+
 
       
     </div>
+  
   );
 }
 

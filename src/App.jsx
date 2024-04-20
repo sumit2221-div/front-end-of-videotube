@@ -12,16 +12,18 @@ import VideoPlayer from './components/playvideo.jsx';
 import Box from './components/box.jsx';
 import CreateTweet from './components/tweet.jsx';
 import Tweets from "./components/tweets"
+import Changepassword from './components/changepassword.jsx';
 
 const App = () => {
-  const isLoggedIn = useSelector(state => state.isLoggedIn)  || sessionStorage.getItem('accessToken')
+  
+  const accessToken = sessionStorage.getItem('accessToken');
 
- 
   return (
     <div>
       <Box>
         <Routes>
-          <Route path="/" element={!isLoggedIn ? <Login /> : <Home />} />
+        
+          <Route path="/" element={accessToken ? <Home /> : <Login/>} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Registration" element={<Registration />} />
           <Route path='/PublishVideo' element={<PublishVideo />} />
@@ -30,6 +32,7 @@ const App = () => {
           <Route path="/video/:id" element={<VideoPlayer />} />
           <Route path='/tweet' element={<CreateTweet />} />
           <Route path='/tweets' element={<Tweets />} />
+          <Route path='/change' element={<Changepassword/>}/>
         </Routes>
       </Box>
     </div>

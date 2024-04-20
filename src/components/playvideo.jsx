@@ -18,6 +18,9 @@ const VideoPlayer = () => {
   const [useravatar, setUserAvatar] = useState(null)
   const [likes , setlikes] = useState(null)
   const [dislikes , setDislikes] = useState(null)
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriber, setsubscriber]=  useState(null)
+  
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -64,6 +67,18 @@ const VideoPlayer = () => {
       setlikes(LikeRes.data.data.likes)
       setDislikes(LikeRes.data.data.dislikes)
       console.log(LikeRes.data.data)
+
+      const subsRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/subscription/c/${videoResponse.data.data.owner}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+
+      })
+if(subsRes){
+  setsubscriber(subsRes.data.data.length)
+  console.log(subsRes.data.data.length)
+}
+    
     
 
       } catch (error) {
@@ -126,10 +141,47 @@ const VideoPlayer = () => {
       console.error('Error submitting comment:', error);
     }
   };
+
+  const handleSubscribe = async () => {
+    try {
+      const response = await axios.post(
+        `https://backend-of-videotube.onrender.com/api/v1/subscription/c/${owner._id}`,
+        {}, // Empty data for POST request body
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+  
+      if (response.status === 200) {
+        // Subscription successful, update state
+        setIsSubscribed(true);
+        console.log('Subscription successful');
+        console.log(response.data);
+      } else {
+        // Handle subscription failure
+        console.error('Subscription failed');
+      }
+    } catch (error) {
+      // Check if the error is due to unauthorized access
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access:', error.response.data);
+        // You may want to redirect the user to the login page or display an error message
+      } else {
+        console.error('Error subscribing:', error);
+      }
+    }
+  };
+
+
+  
+
   
   if (!video || !owner) {
     return <div>Loading...</div>;
   }
+  const buttonText = isSubscribed ? 'Subscribed' :  'Subscribe'
 
   return (
     <div className='flex flex-col w-full h-auto gap-5 mx-12 rounded-xl'>
@@ -140,12 +192,15 @@ const VideoPlayer = () => {
       <div className='h-[100px] w-[900px] bg-transparent relative left-8 rounded-xl'>
         <h1 className='text-2xl text-white'>{video.title}</h1>
         {owner && (
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-5'>
             <img className='h-[40px] w-[40px] rounded-full' src={owner.avatar} alt={owner.username} />
             <h1 className='text-white'>{owner.username}</h1>
+            <button onClick={handleSubscribe} className='h-[50px] w-[100px] rounded-xl bg-slate-500'>{buttonText}</button>
           </div>
         )}
         <div className='absolute right-0 flex gap-3 mt-3 top-3'>
+
+     
           <button className={`flex items-center justify-center w-24 h-10 rounded-md focus:outline-none ${liked ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`} onClick={handleLikeToggle} disabled={liked}>
             {liked ? <AiFillLike className='mr-1' /> : <AiOutlineLike className='mr-1' />} Like <span>{likes}</span>
           </button>

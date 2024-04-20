@@ -11,65 +11,87 @@ const Login = () => {
   const [error, setError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading , setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Reset error state
+    setLoading(true); // Set loading state to true
 
     try {
+      // Basic validation
+      if (!email || !password) {
+        throw new Error('Please fill in all fields');
+      }
+
       const response = await axios.post('https://backend-of-videotube.onrender.com/api/v1/users/login', {
         email,
         password,
       });
-      const {  accessToken } = response.data.data;
-      // Store the access token in local storage
-    sessionStorage.setItem('accessToken', accessToken);
-      
-      // Dispatch authlogin action with email and access token
+      const { accessToken } = response.data.data;
+      sessionStorage.setItem('accessToken', accessToken);
+
       dispatch(authLogin({ email, password }));
 
       if (response.data) {
-        console.log(response.data)
+        console.log(response.data);
         navigate("/");
-        console.log(sessionStorage.getItem('accessToken'));
-
       }
-
     } catch (error) {
       console.error(error);
-      setError(error.response.data.message); // Assuming error message is returned in response
+      setError(error.message || 'An error occurred'); // Update error state with appropriate message
+    } finally {
+      setLoading(false); // Set loading state to false regardless of success or failure
     }
   };
 
   return (
-    <form className='h-[300px] w-[300px] bg-slate-400 text-white flex flex-col gap-5 absolute top-[30%] left-[40%] rounded-2xl items-center' onSubmit={handleSubmit}>
-      <h1 className='text-2xl text-center text-slate-800'>Login form</h1>
+    <form className='px-8 pt-6 pb-8 mx-auto mt-20 mb-4 bg-gray-300 shadow-md w-80 rounded-xl' onSubmit={handleSubmit}>
+      <h1 className='mb-5 text-2xl font-bold text-center text-gray-800'>Login</h1>
 
-      {error && <h1 className="text-red-600 text-1xl">{error}</h1>}
+      {error && <p className="mb-5 text-center text-red-500">{error}</p>}
+      
+      {loading && (
+        <div className="flex items-center justify-center mb-5">
+          <svg className="w-6 h-6 mr-3 text-gray-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8.001 8.001 0 0019.708 15H16v4.582zM20 12c0-4.418-3.582-8-8-8v4c2.22 0 4 1.79 4 4h4zm-2-1.709V7.001A7.97 7.97 0 0012 7v4.291l2.291 2.292z"></path>
+          </svg>
+          <span className="text-gray-600">Logging in...</span>
+        </div>
+      )}
 
-      <input className="peer h-[50px] w-[200px] border-b border-blue-gray-200 bg-transparent pt-4 pb-1.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+      <input 
+        className="block w-full px-4 py-2 mb-4 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
         type="text"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <input className="peer h-[50px] w-[200px] border-b border-blue-gray-200 bg-transparent pt-4 pb-1.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+      <input 
+        className="block w-full px-4 py-2 mb-6 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <p className="mt-2 text-base text-center text-white">
-        Already have an account?&nbsp;
-        <Link
-          to="/Registration"
-          className="font-medium transition-all duration-200 text-primary hover:underline"
-        >
-          sign in
-        </Link>
+      
+      <button 
+        className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+        type="submit"
+        disabled={loading}
+      >
+        Log In
+      </button>
+
+      <p className="mt-4 text-center text-gray-600">
+        <Link to="/forgot-password" className="font-medium hover:underline">Forgot your password?</Link>
       </p>
 
-      <button className='h-[50px] w-[100px] bg-slate-800 rounded-xl box-shadow-sm' type="submit">Login</button>
+      <p className="mt-2 text-center text-gray-600">
+        New user? <Link to="/registration" className="font-medium hover:underline">Sign up here</Link>
+      </p>
     </form>
   );
 };

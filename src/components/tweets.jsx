@@ -40,7 +40,7 @@ const Tweets = () => {
       const newTweets = response.data.data.tweets;
       setTweets(prevTweets => [...prevTweets, ...newTweets]); // Append new tweets to existing tweets
      
-      console.log(response.data); // Check if there are more tweets to fetch
+      console.log(response.data.data.tweets); // Check if there are more tweets to fetch
     } catch (error) {
       console.error('Error fetching tweets:', error);
     }

@@ -48,6 +48,7 @@ const Home = ({ searchQuery }) => {
 
       setVideos(videosWithOwnerData);
       setTotalPages(response.data.data.totalPages);
+      console.log(accessToken)
     
     
     } catch (error) {
@@ -74,7 +75,7 @@ const Home = ({ searchQuery }) => {
   }
 
   return (
-    <div className="container h-auto gap-10 px-4 py-4 mx-10">
+    <div className="container h-auto gap-10 mx-10 ">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {videos.map(video => (
           <div key={video.id}>
