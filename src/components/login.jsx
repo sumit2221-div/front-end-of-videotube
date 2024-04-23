@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { login as authLogin } from '../store/authslice';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [loading , setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +49,7 @@ const Login = () => {
       <h1 className='mb-5 text-2xl font-bold text-center text-gray-800'>Login</h1>
 
       {error && <p className="mb-5 text-center text-red-500">{error}</p>}
-      
+
       {loading && (
         <div className="flex items-center justify-center mb-5">
           <svg className="w-6 h-6 mr-3 text-gray-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -61,7 +60,7 @@ const Login = () => {
         </div>
       )}
 
-      <input 
+      <input
         className="block w-full px-4 py-2 mb-4 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
         type="text"
         placeholder="Email"
@@ -69,16 +68,15 @@ const Login = () => {
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <input 
+      <input
         className="block w-full px-4 py-2 mb-6 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-<<<<<<< HEAD
-      
-      <button 
+
+      <button
         className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
         type="submit"
         disabled={loading}
@@ -88,19 +86,9 @@ const Login = () => {
 
       <p className="mt-4 text-center text-gray-600">
         <Link to="/forgot-password" className="font-medium hover:underline">Forgot your password?</Link>
-=======
-      <p className="mt-2 text-base text-center text-white">
-        new user?&nbsp;
-        <Link
-          to="/Registration"
-          className="font-medium transition-all duration-200 text-primary hover:underline"
-        >
-          sign in
-        </Link>
->>>>>>> 11119553776432ec1c1cfc01237372e9edb880a9
       </p>
 
-      <p className="mt-2 text-center text-gray-600">
+      <p className="mt-2 text-base text-center text-gray-600">
         New user? <Link to="/registration" className="font-medium hover:underline">Sign up here</Link>
       </p>
     </form>
