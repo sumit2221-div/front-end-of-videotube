@@ -76,6 +76,7 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+<<<<<<< HEAD
       
       <button 
         className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
@@ -87,6 +88,16 @@ const Login = () => {
 
       <p className="mt-4 text-center text-gray-600">
         <Link to="/forgot-password" className="font-medium hover:underline">Forgot your password?</Link>
+=======
+      <p className="mt-2 text-base text-center text-white">
+        new user?&nbsp;
+        <Link
+          to="/Registration"
+          className="font-medium transition-all duration-200 text-primary hover:underline"
+        >
+          sign in
+        </Link>
+>>>>>>> 11119553776432ec1c1cfc01237372e9edb880a9
       </p>
 
       <p className="mt-2 text-center text-gray-600">
