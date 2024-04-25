@@ -35,12 +35,14 @@ const Login = () => {
       if (response.data) {
         console.log(response.data);
         navigate("/");
+       
       }
     } catch (error) {
       console.error(error);
       setError(error.message || 'An error occurred'); // Update error state with appropriate message
     } finally {
-      setLoading(false); // Set loading state to false regardless of success or failure
+      setLoading(false); 
+     
     }
   };
 

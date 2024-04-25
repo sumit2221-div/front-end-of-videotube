@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import Registration from './components/Registration';
+import { Registration } from './components/registation/Registration.jsx';
 import Login from './components/login.jsx';
 import Home from "./components/home"
 import PublishVideo from "./components/publishVideo.jsx";

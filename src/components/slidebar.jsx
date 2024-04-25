@@ -25,7 +25,7 @@ const Sidebar = ({ onToggle }) => {
     {
       text: "Subscription",
       slug: "/subscription",
-      icon: <MdSubscriptions />,
+      icon: <MdSubscriptions  />,
     }
   ];
 
@@ -53,7 +53,7 @@ const Sidebar = ({ onToggle }) => {
         <div className="relative flex flex-col p-4 sidebar-content top-10">
           <ul className={`flex flex-col gap-5 ${isOpen ? 'mt-5' : 'mt-0'}`}>
             {slideitems.map((item, index) => (
-              <li key={index} className={`text-3xl flex gap-6 items-center ${item.slug === activeItem ? 'text-green-500' : 'text-white'}`} onClick={() => handleItemClick(item.slug)}>
+              <li key={index} className={`text-3xl flex gap-6 items-center ${item.slug === activeItem ? 'text-blue-500 ' : 'text-white'}`} onClick={() => handleItemClick(item.slug)}>
                 {item.icon}
                   
                 {isOpen && <span className="text-xl ">{item.text}</span> }
