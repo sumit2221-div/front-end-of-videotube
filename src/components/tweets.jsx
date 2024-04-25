@@ -11,13 +11,7 @@ const Tweets = () => {
   useEffect(() => {
     fetchTweets();
 
-    // Add event listener for scroll
-    containerRef.current.addEventListener('scroll', handleScroll);
-
-    // Cleanup function
-    return () => {
-      containerRef.current.removeEventListener('scroll', handleScroll);
-    };
+   
   }, [scroll]); // Run only once when component mounts
 
   const fetchTweets = async () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const VideoCard = ({ video }) => {
+const VideoCard = ({ video}) => {
   // Function to calculate the time difference
   const getTimeDifference = (createdAt) => {
     const now = new Date();

@@ -42,7 +42,7 @@ const CommentList = ({ comments }) => {
       <h2 className='text-2xl text-white'>  {totalComments}Comments</h2>
       {comments.length > 0 ? (
         comments.map(comment => (
-          <div key={comment._id} className='h-[70px] w-full bg-transparent flex items-center text-white hover:shadow-xl hover:shadow-slate-700'>
+          <div key={comment._id} className='h-[70px] w-full bg-transparent flex items-center text-white  shadow-xl'>
             <img src={owners[comment.owner]?.avatar} className='h-[40px] w-[40px] rounded-full' alt='Owner Avatar' />
             <div className='ml-2'>
             

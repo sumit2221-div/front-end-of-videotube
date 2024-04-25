@@ -13,6 +13,7 @@ import Box from './components/box.jsx';
 import CreateTweet from './components/tweet.jsx';
 import Tweets from "./components/tweets"
 import Changepassword from './components/changepassword.jsx';
+import SubscriptionVideos from './components/subscription.jsx';
 
 const App = () => {
   
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='/tweet' element={<CreateTweet />} />
           <Route path='/tweets' element={<Tweets />} />
           <Route path='/change' element={<Changepassword/>}/>
+          <Route path="/subscription" element={<SubscriptionVideos/>}/>
         </Routes>
       </Box>
     </div>
