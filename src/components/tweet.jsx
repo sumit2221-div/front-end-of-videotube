@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Changed Axios to axios
+import { useNavigate } from 'react-router-dom';
 
 function CreateTweet() {
   const [content, setContent] = useState('');
   const [picture, setPicture] = useState(null);
+  const navigate = useNavigate()
+
 
   const handleContentChange = (event) => {
     setContent(event.target.value);
@@ -33,9 +36,13 @@ function CreateTweet() {
       // Reset form fields after successful submission
       setContent('');
       setPicture(null);
+
+      if(response){
       
       console.log('Tweet created successfully!');
       console.log(response.data);
+      navigate("/tweets")
+      }
     } catch (error) {
       console.error('Error creating tweet:', error);
     }

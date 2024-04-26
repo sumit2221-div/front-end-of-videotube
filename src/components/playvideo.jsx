@@ -59,14 +59,14 @@ const VideoPlayer = () => {
 
               console.log("User fetched successfully");
 
-              const LikeRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/like/${id}`,{
+              const LikeRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/like/v/${id}`,{
               headers: {
                 'Authorization': `Bearer ${accessToken}`
               }
       })
-      setlikes(LikeRes.data.data.likes)
-      setDislikes(LikeRes.data.data.dislikes)
-      console.log(LikeRes.data.data)
+      setlikes(LikeRes.data.data.allLikes)
+      
+      console.log(LikeRes.data.data.allLikes)
 
       const subsRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/subscription/c/${videoResponse.data.data.owner}`, {
         headers: {

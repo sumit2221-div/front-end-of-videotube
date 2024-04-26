@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import VideoCard from "./videocard"
 import ErrorPage from "./error";
+import { BiArrowBack , BiArrowToRight} from "react-icons/bi";
 
 const Home = ({ searchQuery }) => {
   const [videos, setVideos] = useState([]);
@@ -85,11 +86,11 @@ const Home = ({ searchQuery }) => {
       </div>
       <div className="flex mx-[40%] pagination">
         <button onClick={handlePrevPage} disabled={currentPage === 1} className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
-          Previous
+          <BiArrowBack/>
         </button>
         <span>{currentPage} / {totalPages}</span>
         <button onClick={handleNextPage} disabled={currentPage === totalPages} className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
-          Next
+          <BiArrowToRight/>
         </button>
       </div>
     </div>

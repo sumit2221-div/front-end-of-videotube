@@ -17,7 +17,7 @@ import SubscriptionVideos from './components/subscription.jsx';
 
 const App = () => {
   
-  const accessToken = sessionStorage.getItem('accessToken');
+  const accessToken = useSelector(state => state.auth.isLoggedIn)|| sessionStorage.getItem('accessToken');
 
   return (
     <div>
