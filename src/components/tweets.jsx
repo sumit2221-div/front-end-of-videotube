@@ -42,16 +42,9 @@ const Tweets = () => {
     setLoading(false);
   };
 
-  const handleScroll = () => {
-    const container = containerRef.current;
-
-    if (container.scrollHeight - container.scrollTop === container.clientHeight) {
-      fetchTweets(); // Fetch next tweet when scrolled to the bottom
-    }
-  };
-
+ 
   return (
-    <div ref={containerRef} className="max-w-2xl p-4 mx-auto" style={{ overflowY: 'scroll', height: '80vh' }}>
+    <div className="max-w-2xl p-4 mx-auto" style={{ overflowY: 'scroll', height: '80vh' }}>
       <h1 className="mb-4 text-2xl font-bold">Tweets</h1>
       {loading && tweets.length === 0 && <p>Loading...</p>}
       {tweets.length > 0 && (
