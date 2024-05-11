@@ -37,18 +37,23 @@ const CommentList = ({ comments }) => {
     }
   }, [comments]);
 
+ 
+
   return (
     <div className='h-[500px] w-[900px]'>
-      <h2 className='text-2xl text-white'>  {totalComments}Comments</h2>
+      <h2 className='text-2xl text-white'>{totalComments} Comments</h2>
       {comments.length > 0 ? (
         comments.map(comment => (
-          <div key={comment._id} className='h-[70px] w-full bg-transparent flex items-center text-white  shadow-xl'>
-            <img src={owners[comment.owner]?.avatar} className='h-[40px] w-[40px] rounded-full' alt='Owner Avatar' />
-            <div className='ml-2'>
-            
-              <p> {owners[comment.owner]?.username}</p>
-              <p>{comment.content}</p>
+          <div key={comment._id} className='h-[70px] w-full bg-transparent flex items-center justify-between text-white shadow-xl'>
+            <div className='flex items-center'>
+              <img src={owners[comment.owner]?.avatar} className='h-[40px] w-[40px] rounded-full' alt='Owner Avatar' />
+              <div className='ml-2'>
+                <p>{owners[comment.owner]?.username}</p>
+                <p>{comment.content}</p>
+             
+              </div>
             </div>
+            <button onClick={() => handleDeleteComment()} className='text-white'>Delete</button>
           </div>
         ))
       ) : (
@@ -56,6 +61,6 @@ const CommentList = ({ comments }) => {
       )}
     </div>
   );
-};
+}
 
 export default CommentList;

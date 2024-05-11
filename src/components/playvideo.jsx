@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike } from "react-icons/ai";
+import { Navigate, useParams } from 'react-router-dom';
+import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike , AiOutlineWhatsApp} from "react-icons/ai";
 import CommentList from './Commentlist';
+import { Link ,useNavigate} from 'react-router-dom';
 
 const VideoPlayer = () => {
   const [video, setVideo] = useState(null);
   const [owner, setOwner] = useState(null);
-  const [liked, setLiked] = useState(false); // State to track liked status
-  const [disliked, setDisliked] = useState(false); // State to track disliked status
+  const [liked, setLiked] = useState(0); // State to track liked status
+  const [disliked, setDisliked] = useState(0); // State to track disliked status
   const { id } = useParams();
   const [comments, setComments] = useState([]); // State to store comments
   const [newComment, setNewComment] = useState("");
@@ -16,11 +17,11 @@ const VideoPlayer = () => {
   const [showDescription, setShowDescription] = useState(false);
   const accessToken = sessionStorage.getItem('accessToken');
   const [useravatar, setUserAvatar] = useState(null)
-  const [likes , setlikes] = useState(null)
+  const [likes , setLikes] = useState(null)
   const [dislikes , setDislikes] = useState(null)
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [subscriber, setsubscriber]=  useState(null)
-  
+  const [subscriber, setSubscriber] = useState(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -30,10 +31,12 @@ const VideoPlayer = () => {
             'Authorization': `Bearer ${accessToken}`
           }
         });
-        setVideo(videoResponse.data.data);
-        console.log(videoResponse.data.data)
+        setVideo(videoResponse.data.data.video);
+        setLiked(videoResponse.data.data.likestatus);
+        setIsSubscribed(videoResponse.data.data.isSubscriber);
+        console.log(videoResponse.data);
 
-        const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${videoResponse.data.data.owner}`, {
+        const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${videoResponse.data.data.video.owner}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
@@ -47,40 +50,32 @@ const VideoPlayer = () => {
           }
         });
         setComments(commentsResponse.data.data.comments);
-      
-            
-              
-              const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
-                headers: {
-                  'Authorization': `Bearer ${accessToken}`
-                }
-              });
-              setUserAvatar(response.data.data.avatar);
 
-              console.log("User fetched successfully");
+        const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+        setUserAvatar(response.data.data.avatar);
+        console.log("User fetched successfully");
 
-              const LikeRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/like/v/${id}`,{
-              headers: {
-                'Authorization': `Bearer ${accessToken}`
-              }
-      })
-      setlikes(LikeRes.data.data.allLikes)
-      
-      console.log(LikeRes.data.data.allLikes)
+        const likeRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/like/v/${id}`,{
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+        setLikes(likeRes.data.data.allLikes.length);
+        console.log(likeRes.data.data.allLikes.length);
 
-      const subsRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/subscription/c/${videoResponse.data.data.owner}`, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
+        const subsRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/subscription/c/${videoResponse.data.data.video.owner}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+        if(subsRes) {
+          setSubscriber(subsRes.data.data.length);
+          console.log(subsRes.data.data.length);
         }
-
-      })
-if(subsRes){
-  setsubscriber(subsRes.data.data.length)
-  console.log(subsRes.data.data.length)
-}
-    
-    
-
       } catch (error) {
         console.error('Error fetching video:', error);
       }
@@ -98,9 +93,7 @@ if(subsRes){
         }
       });
       if (response.status === 200) {
-        setLiked(!liked);
-        setDisliked(false); 
-        // Ensure that only one of like/dislike can be selected
+        setDisliked(false);
       }
       console.log(response.data)
     } catch (error) {
@@ -117,7 +110,6 @@ if(subsRes){
       });
       if (response.status === 200) {
         setDisliked(!disliked);
-        setLiked(false); // Ensure that only one of like/dislike can be selected
       }
     } catch (error) {
       console.error('Error toggling dislike:', error);
@@ -136,7 +128,9 @@ if(subsRes){
           }
         }
       );
-      console.log(response.data);
+    if(response.ok){
+      navigate("/commentlist")
+    }
     } catch (error) {
       console.error('Error submitting comment:', error);
     }
@@ -155,8 +149,6 @@ if(subsRes){
       );
   
       if (response.status === 200) {
-        // Subscription successful, update state
-        setIsSubscribed(true);
         console.log('Subscription successful');
         console.log(response.data);
       } else {
@@ -174,10 +166,14 @@ if(subsRes){
     }
   };
 
+  const handleShareWhatsApp = () => {
+    // Create a WhatsApp share link with video URL
+    const whatsappLink = `https://wa.me/?text=Check out this video: ${window.location.href}`;
 
-  
+    // Open WhatsApp with the share link
+    window.open(whatsappLink, '_blank');
+  };
 
-  
   if (!video || !owner) {
     return <div>Loading...</div>;
   }
@@ -193,14 +189,19 @@ if(subsRes){
         <h1 className='text-2xl text-white'>{video.title}</h1>
         {owner && (
           <div className='flex items-center gap-5'>
+            <Link to={`/user/c/${owner.username}`}>
             <img className='h-[40px] w-[40px] rounded-full' src={owner.avatar} alt={owner.username} />
+            </Link>
             <h1 className='text-white'>{owner.username}</h1>
             <button onClick={handleSubscribe} className='h-[50px] w-[100px] rounded-xl bg-slate-500'>{buttonText}</button>
+         
           </div>
         )}
         <div className='absolute right-0 flex gap-3 mt-3 top-3'>
+        <button onClick={handleShareWhatsApp} className='h-10 w-[100px] rounded-xl bg-green-500 flex items-center justify-center text-2xl text-white'>
+  <AiOutlineWhatsApp />
+</button>
 
-     
           <button className={`flex items-center justify-center w-24 h-10 rounded-md focus:outline-none ${liked ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`} onClick={handleLikeToggle} disabled={liked}>
             {liked ? <AiFillLike className='mr-1' /> : <AiOutlineLike className='mr-1' />} Like <span>{likes}</span>
           </button>
@@ -215,7 +216,6 @@ if(subsRes){
             <button onClick={() => setShowDescription(!showDescription)} className="relative mt-8 text-white">{showDescription ? "Show Less" : "Show More"}</button>
           </div>
         </div>
-
         <div>
           <form className='h-[100px] w-[900px] rounded-xl flex' onSubmit={handleSubmit}>
             <div className="flex items-center w-full">
