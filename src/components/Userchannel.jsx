@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 function UserChannelPage() {
   const [channelData, setChannelData] = useState(null);
-  const [userVideos, setUserVideos] = useState(null); // Initialize with placeholder boxes
+  const [userVideos, setUserVideos] = useState([]); // Initialize with placeholder boxes
   const { username } = useParams();
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,10 @@ function UserChannelPage() {
             'Authorization': `Bearer ${accessToken}`
           }
         });
+        
         setUserVideos(response.data.data);
+        console.log(response)
+        
       } catch (error) {
         console.error('Error fetching user videos:', error);
       }
