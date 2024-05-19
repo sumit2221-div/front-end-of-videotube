@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-const VideoCard = ({ video }) => {
-  const [isLoading, setIsLoading] = useState(true);
-
+const VideoCard = ({ video}) => {
   // Function to calculate the time difference
   const getTimeDifference = (createdAt) => {
     const now = new Date();
@@ -29,28 +27,16 @@ const VideoCard = ({ video }) => {
   // Get the time difference in human-readable format
   const timeDifference = getTimeDifference(video.createdAt);
 
-  // Handle image loading
-  useEffect(() => {
-    const img = new Image();
-    img.src = video.thumbnail;
-    img.onload = () => setIsLoading(false);
-  }, [video.thumbnail]);
-
   return (
     <Link to={`video/${video._id}`}>
-      <div className={`rounded-lg w-[400px] flex flex-wrap ${isLoading ? 'bg-black' : 'bg-transparent'}`}>
-        <img 
-          className="object-cover object-center w-full h-[200px] rounded-xl" 
-          src={video.thumbnail} 
-          alt={video.title} 
-          style={{ display: isLoading ? 'none' : 'block' }}
-          onLoad={() => setIsLoading(false)}
-        />
-        <div className="w-full p-4 text-white bg-transparent h-[90px]">
+      <div className=" bg-transparent rounded-lg  w-[400px] flex flex-wrap">
+        <img className="object-cover object-center w-full h-[200px] rounded-xl" src={video.thumbnail} alt={video.title} />
+        <div className="w-full p-4 text-white bg-transparent  h-[90px]">
           <img className="h-[50px] w-[50px] rounded-full" src={video.owner.avatar} alt={video.owner.username} />
           <div className='relative flex flex-col flex-wrap mx-16 bottom-16'>
             <h4>{video.title}</h4>
             <h3>{video.owner.username}</h3>
+            
             <h3>{timeDifference}</h3> {/* Display the time difference */}
           </div>
         </div>
