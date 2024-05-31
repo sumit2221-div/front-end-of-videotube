@@ -34,7 +34,7 @@ const VideoPlayer = () => {
         setVideo(videoResponse.data.data.video);
         setLiked(videoResponse.data.data.likestatus);
         setIsSubscribed(videoResponse.data.data.isSubscriber);
-        console.log(videoResponse.data);
+      
 
         const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${videoResponse.data.data.video.owner}`, {
           headers: {
@@ -65,7 +65,7 @@ const VideoPlayer = () => {
           }
         });
         setLikes(likeRes.data.data.allLikes.length);
-        console.log(likeRes.data.data.allLikes.length);
+        
 
         const subsRes = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/subscription/c/${videoResponse.data.data.video.owner}`, {
           headers: {
@@ -74,7 +74,7 @@ const VideoPlayer = () => {
         });
         if(subsRes) {
           setSubscriber(subsRes.data.data.length);
-          console.log(subsRes.data.data.length);
+          
         }
       } catch (error) {
         console.error('Error fetching video:', error);
@@ -83,7 +83,7 @@ const VideoPlayer = () => {
 
     fetchVideo();
 
-  }, [id, accessToken, liked]);
+  }, [id, accessToken, liked,comments]);
 
   const handleLikeToggle = async () => {
     try {
@@ -95,7 +95,7 @@ const VideoPlayer = () => {
       if (response.status === 200) {
         setDisliked(false);
       }
-      console.log(response.data)
+      
     } catch (error) {
       console.error('Error toggling like:', error);
     }
@@ -128,9 +128,15 @@ const VideoPlayer = () => {
           }
         }
       );
-    if(response.ok){
-      navigate("/commentlist")
-    }
+      
+    
+      if (response.status === 200) {
+        
+        setNewComment(''); // Clear the input field
+        setIsInputFocused(false); // Reset the focus state
+      }
+
+    
     } catch (error) {
       console.error('Error submitting comment:', error);
     }
@@ -150,7 +156,7 @@ const VideoPlayer = () => {
   
       if (response.status === 200) {
         console.log('Subscription successful');
-        console.log(response.data);
+        
       } else {
         // Handle subscription failure
         console.error('Subscription failed');

@@ -8,6 +8,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Reset error state
+    setLoading(true); // Set loading state to true
 
     try {
       // Basic validation
@@ -26,14 +28,14 @@ const Login = () => {
         email,
         password,
       });
-      const { accessToken } = response.data.data;
-      sessionStorage.setItem('accessToken', accessToken);
 
-      dispatch(authLogin({ email, password }));
-
-      if (response.data) {
-        console.log(response.data);
+      if (response.data && response.data.data) {
+        const { accessToken } = response.data.data;
+        sessionStorage.setItem('accessToken', accessToken);
+        dispatch(authLogin({ email, password }));
         navigate("/");
+      } else {
+        throw new Error('Unexpected response format');
       }
     } catch (error) {
       console.error(error);
@@ -41,9 +43,10 @@ const Login = () => {
       if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message); // Set error from backend response
       } else {
-        setError(error.message || 'An error occurred'); 
-        console.log(error)// Set generic error message
+        setError(error.message || 'An error occurred'); // Set generic error message
       }
+    } finally {
+      setLoading(false); // Set loading state to false after login attempt is finished
     }
   };
 
@@ -72,8 +75,9 @@ const Login = () => {
       <button
         className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
         type="submit"
+        disabled={loading} // Disable the button while loading
       >
-        Log In
+        {loading ? 'Logging in...' : 'Log In'} {/* Display different text based on loading state */}
       </button>
 
       <p className="mt-4 text-center text-gray-600">

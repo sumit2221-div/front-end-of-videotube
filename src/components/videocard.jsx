@@ -1,17 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const VideoCard = ({ video}) => {
-  // Function to calculate the time difference
+const VideoCard = ({ video }) => {
   const getTimeDifference = (createdAt) => {
+    if (!createdAt) return 'Unknown date';
+    
     const now = new Date();
     const createdAtDate = new Date(createdAt);
+    if (isNaN(createdAtDate)) return 'Invalid date';
+    
     const difference = now - createdAtDate;
     const seconds = Math.floor(difference / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
 
+    if (years > 0) {
+      return `${years} year${years > 1 ? 's' : ''} ago`;
+    }
+    if (months > 0) {
+      return `${months} month${months > 1 ? 's' : ''} ago`;
+    }
     if (days > 0) {
       return `${days} day${days > 1 ? 's' : ''} ago`;
     }
@@ -24,20 +35,26 @@ const VideoCard = ({ video}) => {
     return 'Just now';
   };
 
-  // Get the time difference in human-readable format
   const timeDifference = getTimeDifference(video.createdAt);
 
   return (
-    <Link to={`video/${video._id}`}>
-      <div className=" bg-transparent rounded-lg  w-[400px] flex flex-wrap">
-        <img className="object-cover object-center w-full h-[200px] rounded-xl" src={video.thumbnail} alt={video.title} />
-        <div className="w-full p-4 text-white bg-transparent  h-[90px]">
-          <img className="h-[50px] w-[50px] rounded-full" src={video.owner.avatar} alt={video.owner.username} />
-          <div className='relative flex flex-col flex-wrap mx-16 bottom-16'>
-            <h4>{video.title}</h4>
-            <h3>{video.owner.username}</h3>
-            
-            <h3>{timeDifference}</h3> {/* Display the time difference */}
+    <Link to={`/video/${video._id}`}>
+      <div className="bg-transparent rounded-lg w-[400px] flex flex-wrap transform transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+        <img
+          className="object-cover object-center w-full h-[200px] rounded-xl"
+          src={video.thumbnail}
+          alt={video.title}
+        />
+        <div className="w-full p-4 text-white bg-transparent h-[90px] flex items-center">
+          <img
+            className="h-[50px] w-[50px] rounded-full"
+            src={video.owner.avatar}
+            alt={`Avatar of ${video.owner.username}`}
+          />
+          <div className='flex flex-col ml-4'>
+            <h4 className="text-lg font-semibold">{video.title}</h4>
+            <h3 className="text-sm text-gray-400">{video.owner.username}</h3>
+            <h4 className="text-sm text-gray-400">{timeDifference}</h4>
           </div>
         </div>
       </div>

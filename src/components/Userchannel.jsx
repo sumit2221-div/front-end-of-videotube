@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { MdDelete } from 'react-icons/md';
+import { FaSpinner } from 'react-icons/fa';
 
 function UserChannelPage() {
   const [channelData, setChannelData] = useState(null);
-  const [userVideos, setUserVideos] = useState([]); // Initialize with placeholder boxes
+  const [userVideos, setUserVideos] = useState([]);
   const { username } = useParams();
   const [loading, setLoading] = useState(true);
+  const [deletingVideoId, setDeletingVideoId] = useState(null);
 
   useEffect(() => {
     const fetchChannelData = async () => {
@@ -18,8 +21,7 @@ function UserChannelPage() {
           }
         });
         setChannelData(response.data.data);
-
-        setLoading(false); // Set loading to false once data is fetched
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching user channel data:', error);
       }
@@ -33,10 +35,7 @@ function UserChannelPage() {
             'Authorization': `Bearer ${accessToken}`
           }
         });
-        
         setUserVideos(response.data.data);
-        console.log(response)
-        
       } catch (error) {
         console.error('Error fetching user videos:', error);
       }
@@ -46,9 +45,28 @@ function UserChannelPage() {
     fetchUserVideos();
   }, [username]);
 
+  const handleDelete = async (videoId) => {
+    try {
+      setDeletingVideoId(videoId);
+      const accessToken = sessionStorage.getItem('accessToken');
+      await axios.delete(`https://backend-of-videotube.onrender.com/api/v1/video/${videoId}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+   
+      setUserVideos(userVideos.filter(video => video._id !== videoId));
+      
+    } catch (error) {
+      console.error('Error deleting video:', error);
+    } finally {
+      setDeletingVideoId(null);
+    }
+  };
+
   if (!channelData || loading) {
     return (
-      <div className="w-full">
+      <div className="w-full mx-10">
         <div className="flex w-auto gap-5 bg-transparent">
           <div className="h-[200px] w-[200px] relative top-5 left-5 animate-pulse bg-gray-600 rounded-full"></div>
           <div className="relative gap-5 flex flex-col h-[300px] mt-8">
@@ -79,7 +97,7 @@ function UserChannelPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full mx-10">
       <div className="flex w-auto gap-5 bg-transparent">
         <img src={channelData.avatar} className="h-[200px] w-[200px] rounded-full relative top-5 left-5" alt={channelData.fullName} />
         <div className="relative gap-5 flex flex-col h-[300px] mt-8">
@@ -94,15 +112,24 @@ function UserChannelPage() {
           <h3 className="text-xl text-white">subscriber {channelData.subscribersCount}</h3>
         </div>
       </div>
-      <div className="w-full mx-20">
+      <div className="w-full mx-10">
         <h2 className="mb-4 text-2xl font-semibold text-white">Videos</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {userVideos.map(video => (
-            <div key={video._id} className="overflow-hidden bg-gray-800 rounded-lg">
+            <div key={video._id} className="relative overflow-hidden bg-transparent shadow-xl rounded-lg w-[450px]">
               <img src={video.thumbnail} alt={video.title} className="object-cover w-full h-48" />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-white">{video.title}</h3>
-                <p className="text-gray-400">{video.views} views</p>
+              <div className="flex items-center justify-between p-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{video.title}</h3>
+                  <p className="text-gray-400">{video.views} views</p>
+                </div>
+                <button 
+                  className="text-white" 
+                  onClick={() => handleDelete(video._id)}
+                  disabled={deletingVideoId === video._id}
+                >
+                  {deletingVideoId === video._id ? <FaSpinner className="animate-spin" /> : <MdDelete size={24} />}
+                </button>
               </div>
             </div>
           ))}
