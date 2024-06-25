@@ -120,7 +120,7 @@ const VideoPlayer = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `https://backend-of-videotube.onrender.com/api/v1/comment/${id}`,
+        `https://backend-of-videotube.onrender.com/api/v1/comment/v/${id}`,
         { content: newComment },
         {
           headers: {

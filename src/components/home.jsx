@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import VideoCard from "./videocard"
-import ErrorPage from "./error";
+import ErrorPage from "./errorbox.jsx";
 import { BiArrowBack , BiArrowToRight} from "react-icons/bi";
 
 const Home = ({ searchQuery }) => {
@@ -16,27 +16,22 @@ const Home = ({ searchQuery }) => {
 
   const fetchVideos = async () => {
     try {
-      const accessToken =  sessionStorage.getItem('accessToken')
+     
       const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/video`, {
         params: {
           page: currentPage,
           limit: 12,
           search: searchQuery
         },
-        headers: {
-          'Authorization':  `Bearer ${accessToken}`
-        
-        }
+       
       });
     
 
       const videosWithOwnerData = await Promise.all(response.data.data.videos.map(async (video) => {
         try {
           const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${video.owner}`, {
-            headers: {
-              'Authorization':  `Bearer ${accessToken}`
+         
             
-            }
           });
           const ownerData = ownerResponse.data.data;
           
@@ -49,7 +44,8 @@ const Home = ({ searchQuery }) => {
 
       setVideos(videosWithOwnerData);
       setTotalPages(response.data.data.totalPages);
-      console.log(accessToken)
+      console.log(videosWithOwnerData)
+    
     
     
     } catch (error) {

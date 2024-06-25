@@ -24,17 +24,17 @@ const App = () => {
       <Box>
         <Routes>
         
-          <Route path="/" element={accessToken ? <Home /> : <Login/>} />
+          <Route path="/" element={<Home/>} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Registration" element={<Registration />} />
-          <Route path='/PublishVideo' element={<PublishVideo />} />
+          <Route path='/PublishVideo' element={accessToken ? <PublishVideo/> : <Login/>}/>
           
-          <Route path="/user/c/:username" element={<UserChannelPage />} />
+          <Route path="/user/c/:username" element={accessToken ? <UserChannelPage /> : <Login/>} />
           <Route path="/video/:id" element={<VideoPlayer />} />
-          <Route path='/tweet' element={<CreateTweet />} />
+          <Route path='/tweet' element={accessToken ? <CreateTweet/> : <Login/>} />
           <Route path='/tweets' element={<Tweets />} />
           <Route path='/change' element={<Changepassword/>}/>
-          <Route path="/subscription" element={<SubscriptionVideos/>}/>
+          <Route path="/subscription" element={accessToken ? <SubscriptionVideos/> : <Login/>}/>
         </Routes>
       </Box>
     </div>
