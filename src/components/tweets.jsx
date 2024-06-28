@@ -26,7 +26,8 @@ const Tweets = () => {
         params: { page: 1, limit: 10 },
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
-      setLiked(response.data.datalikestatus);
+      console.log(response.data)
+
       const tweetsWithOwnerData = await Promise.all(
         response.data.data.tweets.map(async (tweet) => {
           try {

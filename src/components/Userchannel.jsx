@@ -3,19 +3,27 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
 import { FaSpinner } from 'react-icons/fa';
+import { useSpring, animated } from 'react-spring';
 
 function UserChannelPage() {
   const [channelData, setChannelData] = useState(null);
   const [userVideos, setUserVideos] = useState([]);
-  const { username } = useParams();
+  const { userId } = useParams();
   const [loading, setLoading] = useState(true);
   const [deletingVideoId, setDeletingVideoId] = useState(null);
+
+  // Spring animation for loading state
+  const fadeIn = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    config: { duration: 500 },
+  });
 
   useEffect(() => {
     const fetchChannelData = async () => {
       try {
         const accessToken = sessionStorage.getItem('accessToken');
-        const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/c/${username}`, {
+        const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/c/${userId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
@@ -43,7 +51,7 @@ function UserChannelPage() {
 
     fetchChannelData();
     fetchUserVideos();
-  }, [username]);
+  }, [userId]);
 
   const handleDelete = async (videoId) => {
     try {
@@ -54,9 +62,7 @@ function UserChannelPage() {
           'Authorization': `Bearer ${accessToken}`
         }
       });
-   
       setUserVideos(userVideos.filter(video => video._id !== videoId));
-      
     } catch (error) {
       console.error('Error deleting video:', error);
     } finally {
@@ -67,7 +73,7 @@ function UserChannelPage() {
   if (!channelData || loading) {
     return (
       <div className="w-full mx-10">
-        <div className="flex w-auto gap-5 bg-transparent">
+        <animated.div style={fadeIn} className="flex w-auto gap-5 bg-transparent">
           <div className="h-[200px] w-[200px] relative top-5 left-5 animate-pulse bg-gray-600 rounded-full"></div>
           <div className="relative gap-5 flex flex-col h-[300px] mt-8">
             <div className="w-3/4 h-12 mb-4 bg-gray-600 animate-pulse"></div>
@@ -77,7 +83,7 @@ function UserChannelPage() {
             </div>
             <div className="w-2/3 h-8 mt-auto bg-gray-600 animate-pulse"></div>
           </div>
-        </div>
+        </animated.div>
         <div className="w-full mx-20">
           <h2 className="mb-4 text-2xl font-semibold text-white">Videos</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -98,7 +104,7 @@ function UserChannelPage() {
 
   return (
     <div className="w-full mx-10">
-      <div className="flex w-auto gap-5 bg-transparent">
+      <animated.div style={fadeIn} className="flex w-auto gap-5 bg-transparent">
         <img src={channelData.avatar} className="h-[200px] w-[200px] rounded-full relative top-5 left-5" alt={channelData.fullName} />
         <div className="relative gap-5 flex flex-col h-[300px] mt-8">
           <h1 className="font-serif text-5xl text-white">{channelData.fullName}</h1>
@@ -111,7 +117,7 @@ function UserChannelPage() {
           </div>
           <h3 className="text-xl text-white">subscriber {channelData.subscribersCount}</h3>
         </div>
-      </div>
+      </animated.div>
       <div className="w-full mx-10">
         <h2 className="mb-4 text-2xl font-semibold text-white">Videos</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

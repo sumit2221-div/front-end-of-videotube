@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import LOGO from "../assets/LGO.png";
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LogoutButton from './logout';
 import axios from 'axios';
-import { MdVideoLibrary, MdHome, MdLogin, MdOutlineWebAsset } from 'react-icons/md';
-import { BiSearch } from "react-icons/bi"
+import { MdVideoLibrary, MdOutlineWebAsset } from 'react-icons/md';
+import { BiSearch } from "react-icons/bi";
 import { IoPerson } from "react-icons/io5";
 
 const Header = ({ onSearch }) => {
@@ -13,7 +13,8 @@ const Header = ({ onSearch }) => {
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn) || sessionStorage.getItem('accessToken');
   const navigate = useNavigate();
   const [userAvatar, setUserAvatar] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownBoxOpen, setIsDropdownBoxOpen] = useState(false);
 
   const navItems = [
     {
@@ -30,7 +31,7 @@ const Header = ({ onSearch }) => {
     },
     {
       icon: <MdOutlineWebAsset />,
-      text: "text",
+      text: "Tweet",
       slug: "/tweet",
       active: isLoggedIn
     }
@@ -56,11 +57,11 @@ const Header = ({ onSearch }) => {
     };
 
     fetchUserAvatar();
-  }, [isLoggedIn, sessionStorage.getItem('accessToken')]);
+  }, [isLoggedIn]);
 
   const handleGetUserChannel = async () => {
-    const username = userAvatar.username; // Assuming username is available in userAvatar
-    navigate(`/user/c/${username}`);
+    const userId = userAvatar._id;
+    navigate(`/user/c/${userId}`);
   };
 
   const handleSearchInputChange = (event) => {
@@ -91,38 +92,62 @@ const Header = ({ onSearch }) => {
           <BiSearch />
         </button>
       </form>
-      <ul className='flex items-center space-x-5'>
-        {navItems.map((item) =>
-          item.active ? (
-            <li key={item.text}>
-              <button
-                onClick={() => navigate(item.slug)}
-                className='text-xl text-white duration-200 rounded-lg hover:text-gray-300 '
-              >
-                {item.icon}
-              </button>
-            </li>
-          ) : null
+      <div className="flex items-center"> 
+        {!isLoggedIn ? (
+          <button onClick={() => navigate("/Login")} className="flex items-center px-4 py-2 text-sm text-white bg-blue-700 rounded-md hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+            <IoPerson className="mr-2" />
+            Login to use more features
+          </button>
+        ) : (
+          <button onClick={() => setIsDropdownBoxOpen(!isDropdownBoxOpen)} className="group cursor-pointer outline-none hover:rotate-90 duration-300 absolute left-[90%]" title="Add New">
+            <svg className="duration-300 stroke-gray-300 fill-none group-hover:fill-teal-800 group-active:stroke-teal-200 group-active:fill-teal-600 group-active:duration-0" viewBox="0 0 24 24" height="50px" width="50px" xmlns="http://www.w3.org/2000/svg">
+              <path strokeWidth="1.5" d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"></path>
+              <path strokeWidth="1.5" d="M8 12H16"></path>
+              <path strokeWidth="1.5" d="M12 16V8"></path>
+            </svg>
+          </button>
         )}
-        {isLoggedIn && (
-          <li>
-            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className='relative'>
-              <img src={userAvatar.avatar} className='w-8 h-8 rounded-full' alt="User Avatar" />
-              {/* Dropdown arrow */}
-              <svg className="absolute top-0 right-0 w-4 h-4 text-white fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 7l5 5 5-5z" /></svg>
-            </button>
-            {/* Dropdown menu */}
-            {isDropdownOpen && (
-              <div className="absolute right-0 w-48 py-1 bg-gray-800 rounded-md shadow-lg">
-                <button onClick={() => { handleGetUserChannel(); setIsDropdownOpen(false); }} className='block w-full px-4 py-2 text-sm text-left text-white hover:bg-gray-700'>View Channel</button>
+        {isLoggedIn && isDropdownBoxOpen && (
+          <ul className="absolute top-[10%] right-[10%] z-10 mt-2 bg-gray-800 rounded-md shadow-lg">
+            {navItems.map((item) => (
+              item.active && (
+                <li key={item.slug}>
+                  <button
+                    onClick={() => navigate(item.slug)}
+                    className='block px-4 py-2 text-sm text-left text-white hover:bg-gray-700'
+                  >
+                    {item.text}
+                  </button>
+                </li>
+              )
+            ))}
+          </ul>
+        )}
+      </div>
+      {isLoggedIn && (
+        <div className="relative">
+          <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className='relative'>
+            <img src={userAvatar.avatar} className='w-8 h-8 rounded-full' alt="User Avatar" />
+            <svg className="absolute top-0 right-0 w-4 h-4 text-white fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M5 7l5 5 5-5z" />
+            </svg>
+          </button>
+          {isDropdownOpen && (
+            <ul className="absolute right-0 z-10 mt-2 bg-gray-800 rounded-md shadow-lg w-[150px]">
+              <li>
+                <button onClick={() => { handleGetUserChannel(); setIsDropdownOpen(false); }} className='block px-4 py-2 text-sm text-left text-white hover:bg-gray-700'>
+                  View Channel
+                </button>
+              </li>
+              <li>
                 <LogoutButton />
-              </div>
-            )}
-          </li>
-        )}
-      </ul>
+              </li>
+            </ul>
+          )}
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
 export default Header;

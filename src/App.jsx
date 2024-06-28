@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/Registration" element={<Registration />} />
           <Route path='/PublishVideo' element={accessToken ? <PublishVideo/> : <Login/>}/>
           
-          <Route path="/user/c/:username" element={accessToken ? <UserChannelPage /> : <Login/>} />
+          <Route path="/user/c/:userId" element={accessToken ? <UserChannelPage /> : <Login/>} />
           <Route path="/video/:id" element={<VideoPlayer />} />
           <Route path='/tweet' element={accessToken ? <CreateTweet/> : <Login/>} />
           <Route path='/tweets' element={<Tweets />} />
