@@ -86,6 +86,10 @@ const VideoPlayer = () => {
   }, [id, accessToken, liked,comments]);
 
   const handleLikeToggle = async () => {
+    if (!accessToken) {
+      alert("You have to login first to like this tweet.");
+      return;
+    }
     try {
       const response = await axios.post(`https://backend-of-videotube.onrender.com/api/v1/like/toggle/v/${id}`, {}, {
         headers: {
@@ -102,6 +106,10 @@ const VideoPlayer = () => {
   };
 
   const handleDislikeToggle = async () => {
+    if (!accessToken) {
+      alert("You have to login first to like this tweet.");
+      return;
+    }
     try {
       const response = await axios.post(`https://backend-of-videotube.onrender.com/api/v1/like/toggle/v/${id}`, {}, {
         headers: {
@@ -117,6 +125,10 @@ const VideoPlayer = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (!accessToken) {
+      alert("You have to login first to like this tweet.");
+      return;
+    }
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -143,6 +155,10 @@ const VideoPlayer = () => {
   };
 
   const handleSubscribe = async () => {
+    if (!accessToken) {
+      alert("You have to login first to like this tweet.");
+      return;
+    }
     try {
       const response = await axios.post(
         `https://backend-of-videotube.onrender.com/api/v1/subscription/c/${owner._id}`,
