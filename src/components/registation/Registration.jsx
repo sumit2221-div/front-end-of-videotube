@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { RegistrationDetails } from './regestationform.jsx';
 import RegistrationFiles from './registaionfile.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Registration = () => {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate()
   const [details, setDetails] = useState({
     fullName: '',
     username: '',
@@ -45,8 +47,11 @@ const Registration = () => {
         method: 'POST',
         body: formData
       });
+    if(response.ok){
       const data = await response.json();
-      console.log(data); // Handle response from backend
+      console.log(data)
+      navigate('/Login')
+    } // Handle response from backend
     } catch (error) {
       console.log('Error:', error);
     }
