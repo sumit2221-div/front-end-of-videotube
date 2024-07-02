@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Registration = () => {
   const [step, setStep] = useState(1);
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false); // Add loading state
+  const navigate = useNavigate();
   const [details, setDetails] = useState({
     fullName: '',
     username: '',
@@ -32,6 +33,7 @@ const Registration = () => {
 
   const handleSubmitFiles = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
 
     // Combine details and files data and submit the registration
     const formData = new FormData();
@@ -47,20 +49,33 @@ const Registration = () => {
         method: 'POST',
         body: formData
       });
-    if(response.ok){
-      const data = await response.json();
-      console.log(data)
-      navigate('/Login')
-    } // Handle response from backend
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        navigate('/Login');
+      } // Handle response from backend
     } catch (error) {
       console.log('Error:', error);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
-    <div className="flex items-center justify-center ">
-      <div className='bg-gray-500 h-[400px] w-[400px] rounded-xl flex items-center'>
-        {step === 1 ? (
+    <div className="flex items-center justify-center">
+      <div className='bg-gray-500 h-[400px] w-[400px] rounded-xl flex items-center justify-center'>
+        {loading ? (
+        <div class="text-center">
+        <div
+          class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-yellow-500 mx-auto"
+        ></div>
+        <h2 class="text-zinc-900 dark:text-white mt-4">Loading...</h2>
+        <p class="text-zinc-600 dark:text-zinc-400">
+          please wait you are being register
+        </p>
+      </div>
+      
+        ) : step === 1 ? (
           <RegistrationDetails
             fullName={details.fullName}
             username={details.username}
