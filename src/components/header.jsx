@@ -10,7 +10,7 @@ import { IoPerson } from "react-icons/io5";
 
 const Header = ({ onSearch }) => {
   const [query, setQuery] = useState("");
-  const isLoggedIn = useSelector(state => state.auth.isLoggedIn) || sessionStorage.getItem('accessToken');
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const navigate = useNavigate();
   const [userAvatar, setUserAvatar] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -48,11 +48,10 @@ const Header = ({ onSearch }) => {
             }
           });
           setUserAvatar(response.data.data);
-          console.log("User fetched successfully");
-          console.log(response.data.data);
         }
       } catch (error) {
         console.error('Error fetching user avatar:', error);
+        setUserAvatar({ avatar: 'default-avatar.png' }); // Fallback avatar
       }
     };
 
@@ -88,7 +87,7 @@ const Header = ({ onSearch }) => {
           placeholder="Search videos..."
           required
         />
-        <button type="submit" className="flex items-center justify-center w-10 h-10 ml-2 text-white bg-blue-700 rounded-md hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+        <button type="submit" className="flex items-center justify-center w-10 h-10 ml-2 text-white bg-blue-700 rounded-md hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300" aria-label="Search">
           <BiSearch />
         </button>
       </form>
@@ -99,7 +98,7 @@ const Header = ({ onSearch }) => {
             Login to use more features
           </button>
         ) : (
-          <button onClick={() => setIsDropdownBoxOpen(!isDropdownBoxOpen)} className="group cursor-pointer outline-none hover:rotate-90 duration-300 absolute left-[90%]" title="Add New">
+          <button onClick={() => setIsDropdownBoxOpen(!isDropdownBoxOpen)} className="relative duration-300 outline-none cursor-pointer group hover:rotate-90" title="Add New" aria-expanded={isDropdownBoxOpen}>
             <svg className="duration-300 stroke-gray-300 fill-none group-hover:fill-teal-800 group-active:stroke-teal-200 group-active:fill-teal-600 group-active:duration-0" viewBox="0 0 24 24" height="50px" width="50px" xmlns="http://www.w3.org/2000/svg">
               <path strokeWidth="1.5" d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"></path>
               <path strokeWidth="1.5" d="M8 12H16"></path>
@@ -126,8 +125,8 @@ const Header = ({ onSearch }) => {
       </div>
       {isLoggedIn && (
         <div className="relative">
-          <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className='relative'>
-            <img src={userAvatar.avatar} className='w-8 h-8 rounded-full' alt="User Avatar" />
+          <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className='relative' aria-expanded={isDropdownOpen}>
+            <img src={userAvatar.avatar || 'default-avatar.png'} className='w-8 h-8 rounded-full' alt="User Avatar" />
             <svg className="absolute top-0 right-0 w-4 h-4 text-white fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
               <path d="M5 7l5 5 5-5z" />
             </svg>
