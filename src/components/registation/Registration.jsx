@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { RegistrationDetails } from './regestationform.jsx';
 import RegistrationFiles from './registaionfile.jsx';
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../../api/userApi'; // Import the centralized API function
 
 const Registration = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false); // Add loading state
+  const [errorMessage, setErrorMessage] = useState(''); // Add error message state
   const navigate = useNavigate();
   const [details, setDetails] = useState({
     fullName: '',
@@ -34,6 +36,7 @@ const Registration = () => {
   const handleSubmitFiles = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading
+    setErrorMessage(''); // Reset error message
 
     // Combine details and files data and submit the registration
     const formData = new FormData();
@@ -45,17 +48,13 @@ const Registration = () => {
     formData.append('coverImage', files.coverImage);
 
     try {
-      const response = await fetch('https://backend-of-videotube.onrender.com/api/v1/users/register', {
-        method: 'POST',
-        body: formData
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        navigate('/Login');
-      } // Handle response from backend
+      // Use the centralized API function to register the user
+      const responseMessage = await registerUser(formData);
+      console.log(responseMessage);
+      navigate('/Login'); // Redirect to login page after successful registration
     } catch (error) {
-      console.log('Error:', error);
+      console.error('Error registering user:', error);
+      setErrorMessage(error.message || 'An error occurred during registration. Please try again.');
     } finally {
       setLoading(false); // Stop loading
     }
@@ -63,18 +62,17 @@ const Registration = () => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className='bg-gray-500 h-[400px] w-[400px] rounded-xl flex items-center justify-center'>
+      <div className="bg-gray-500 h-[400px] w-[400px] rounded-xl flex items-center justify-center">
         {loading ? (
-        <div class="text-center">
-        <div
-          class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-yellow-500 mx-auto"
-        ></div>
-        <h2 class="text-zinc-900 dark:text-white mt-4">Loading...</h2>
-        <p class="text-zinc-600 dark:text-zinc-400">
-          please wait you are being register
-        </p>
-      </div>
-      
+          <div className="text-center">
+            <div
+              className="w-16 h-16 mx-auto border-4 border-yellow-500 border-dashed rounded-full animate-spin"
+            ></div>
+            <h2 className="mt-4 text-zinc-900 dark:text-white">Loading...</h2>
+            <p className="text-zinc-600 dark:text-zinc-400">
+              Please wait, you are being registered.
+            </p>
+          </div>
         ) : step === 1 ? (
           <RegistrationDetails
             fullName={details.fullName}
@@ -92,6 +90,7 @@ const Registration = () => {
             onSubmit={handleSubmitFiles}
           />
         )}
+        {errorMessage && <p className="mt-4 text-center text-red-500">{errorMessage}</p>}
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchAllVideos } from "../api/videoApi"; // Import the API function
+import { fetchUserById } from "../api/userApi"; // Import user API function
 import VideoCard from "./videocard";
-import ErrorPage from "./errorbox"
+import ErrorPage from "./errorbox";
 import { BiArrowBack, BiArrowToRight } from "react-icons/bi";
 
 const Home = ({ searchQuery }) => {
@@ -17,27 +18,21 @@ const Home = ({ searchQuery }) => {
 
   const fetchVideos = async () => {
     setLoading(true); // Set loading to true when fetching starts
+    setError(null); // Reset error state before fetching
 
     try {
-      const response = await axios.get(
-        `https://backend-of-videotube.onrender.com/api/v1/video`,
-        {
-          params: {
-            page: currentPage,
-            limit: 12,
-            search: searchQuery,
-          },
-        }
-      );
+      // Fetch videos using the API service
+      const response = await fetchAllVideos({
+        page: currentPage,
+        limit: 12,
+        search: searchQuery,
+      });
 
+      // Fetch owner data for each video
       const videosWithOwnerData = await Promise.all(
-        response.data.data.videos.map(async (video) => {
+        response.videos.map(async (video) => {
           try {
-            const ownerResponse = await axios.get(
-              `https://backend-of-videotube.onrender.com/api/v1/users/${video.owner}`
-            );
-            const ownerData = ownerResponse.data.data;
-
+            const ownerData = await fetchUserById(video.owner);
             return { ...video, owner: ownerData };
           } catch (error) {
             console.error(`Error fetching owner data for video ${video.id}:`, error);
@@ -47,7 +42,7 @@ const Home = ({ searchQuery }) => {
       );
 
       setVideos(videosWithOwnerData);
-      setTotalPages(response.data.data.totalPages);
+      setTotalPages(response.totalPages);
     } catch (error) {
       console.error("Error fetching videos:", error);
       setError("Failed to fetch videos. Please try again later."); // Set error message
@@ -69,16 +64,7 @@ const Home = ({ searchQuery }) => {
   };
 
   if (loading) {
-    return (
-      
-      <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-transparent">
-      <div className="flex flex-row gap-2">
-        <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce"></div>
-        <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
-        <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
-      </div>
-    </div>
-    )
+    return <FullScreenLoader />;
   }
 
   if (error) {

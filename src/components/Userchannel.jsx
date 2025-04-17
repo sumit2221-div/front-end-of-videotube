@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
 import { FaSpinner } from 'react-icons/fa';
+import { getUserChannelProfile } from '../api/userApi'; // Import API for fetching channel data
+import { fetchSubscriberVideos, deleteVideo } from '../api/videoApi'; // Import video-related APIs
 
 function UserChannelPage() {
   const [channelData, setChannelData] = useState(null);
@@ -14,14 +15,8 @@ function UserChannelPage() {
   useEffect(() => {
     const fetchChannelData = async () => {
       try {
-        const accessToken = sessionStorage.getItem('accessToken');
-        const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/c/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });
-        setChannelData(response.data.data);
-        setLoading(false);
+        const data = await getUserChannelProfile(userId); // Fetch channel data using API
+        setChannelData(data);
       } catch (error) {
         console.error('Error fetching user channel data:', error);
       }
@@ -29,32 +24,27 @@ function UserChannelPage() {
 
     const fetchUserVideos = async () => {
       try {
-        const accessToken = sessionStorage.getItem('accessToken');
-        const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/video/v/subscriber`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });
-        setUserVideos(response.data.data);
+        const videos = await fetchSubscriberVideos(); // Fetch videos using API
+        setUserVideos(videos);
       } catch (error) {
         console.error('Error fetching user videos:', error);
       }
     };
 
-    fetchChannelData();
-    fetchUserVideos();
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchChannelData(), fetchUserVideos()]);
+      setLoading(false);
+    };
+
+    fetchData();
   }, [userId]);
 
   const handleDelete = async (videoId) => {
     try {
       setDeletingVideoId(videoId);
-      const accessToken = sessionStorage.getItem('accessToken');
-      await axios.delete(`https://backend-of-videotube.onrender.com/api/v1/video/${videoId}`, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      setUserVideos(userVideos.filter(video => video._id !== videoId));
+      await deleteVideo(videoId); // Delete video using API
+      setUserVideos(userVideos.filter((video) => video._id !== videoId));
     } catch (error) {
       console.error('Error deleting video:', error);
     } finally {
@@ -62,7 +52,7 @@ function UserChannelPage() {
     }
   };
 
-  if (!channelData || loading) {
+  if (loading) {
     return (
       <div className="w-full mx-10">
         <div className="flex w-auto gap-5 bg-transparent animate-fadeIn">
@@ -104,16 +94,16 @@ function UserChannelPage() {
             {channelData.username} <span className="text-white">Video: {channelData.uploadedVideosCount}</span>
           </h3>
           <div className="flex gap-5">
-            <button className="text-white h-[40px] w-[150px] bg-gray-800 rounded-xl">update detail</button>
-            <button className="h-[40px] w-[150px] bg-gray-800 rounded-xl text-white">create playlist</button>
+            <button className="text-white h-[40px] w-[150px] bg-gray-800 rounded-xl">Update Details</button>
+            <button className="h-[40px] w-[150px] bg-gray-800 rounded-xl text-white">Create Playlist</button>
           </div>
-          <h3 className="text-xl text-white">subscriber {channelData.subscribersCount}</h3>
+          <h3 className="text-xl text-white">Subscribers: {channelData.subscribersCount}</h3>
         </div>
       </div>
       <div className="w-full mx-10">
         <h2 className="mb-4 text-2xl font-semibold text-white">Videos</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {userVideos.map(video => (
+          {userVideos.map((video) => (
             <div key={video._id} className="relative overflow-hidden bg-transparent shadow-xl rounded-lg w-[450px]">
               <img src={video.thumbnail} alt={video.title} className="object-cover w-full h-48" />
               <div className="flex items-center justify-between p-4">
@@ -121,8 +111,8 @@ function UserChannelPage() {
                   <h3 className="text-lg font-semibold text-white">{video.title}</h3>
                   <p className="text-gray-400">{video.views} views</p>
                 </div>
-                <button 
-                  className="text-white" 
+                <button
+                  className="text-white"
                   onClick={() => handleDelete(video._id)}
                   disabled={deletingVideoId === video._id}
                 >

@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { BiLike, BiComment, BiShare } from 'react-icons/bi';
 import { GoX } from "react-icons/go";
-import ErrorBox from './errorbox';
+import { fetchAllTweets, toggleTweetLike } from '../api/tweetApi'; // Import tweet-related APIs
+import { fetchTweetComments, addTweetComment } from '../api/commentApi'; // Import comment-related APIs
 
 const Tweets = () => {
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedTweet, setSelectedTweet] = useState(null);
-  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken'));
-  const [liked, setLiked] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [showAllComments, setShowAllComments] = useState(false);
@@ -22,89 +20,36 @@ const Tweets = () => {
   const fetchTweets = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/tweet', {
-        params: { page: 1, limit: 10 },
-        headers: { 'Authorization': `Bearer ${accessToken}` },
-      });
-      console.log(response.data)
-
-      const tweetsWithOwnerData = await Promise.all(
-        response.data.data.tweets.map(async (tweet) => {
-          try {
-            const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${tweet.owner}`);
-            const ownerData = ownerResponse.data.data;
-            return { ...tweet, owner: ownerData };
-          } catch (error) {
-            console.error(`Error fetching owner data for tweet ${tweet.id}:`, error);
-            return tweet;
-          }
-        })
-      );
-      setTweets(tweetsWithOwnerData);
+      const tweetsData = await fetchAllTweets({ page: 1, limit: 10 });
+      setTweets(tweetsData);
     } catch (error) {
       console.error(error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
-      } else {
-        setError(error.message || 'An error occurred');
-      }
+      setError(error.message || 'An error occurred while fetching tweets.');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchTweetComments = async (tweetId) => {
-    try {
-      const response = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/comment/t/${tweetId}`);
-      console.log(response.data.data.comments)
-      const commentwithownerdata = await Promise.all(
-        response.data.data.comments.map(async (comment) => {
-          try {
-            const ownerResponse = await axios.get(`https://backend-of-videotube.onrender.com/api/v1/users/${comment.owner}`);
-            const ownerData = ownerResponse.data.data;
-            return { ...comment, owner: ownerData };
-          } catch (error) {
-            console.error(`Error fetching owner data for comments ${comments.id}:`, error);
-            return comments;
-          }
-        })
-      );
-      setComments(commentwithownerdata)
-      console.log(commentwithownerdata)
-    } catch (error) {
-      console.error(`Error fetching comments for tweet ${tweetId}:`, error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
-      } else {
-        setError(error.message || 'An error occurred');
-      }
-    }
-  };
-
   const handleLikeButton = async (tweetId) => {
-    if (!accessToken) {
-      alert("You have to login first to like this tweet.");
-      return;
-    }
     try {
-      const response = await axios.post(`https://backend-of-videotube.onrender.com/api/v1/like/toggle/t/${tweetId}`, {}, {
-        headers: { 'Authorization': `Bearer ${accessToken}` },
-      });
-      console.log(response.data);
-      // Optionally update liked state or UI based on response
+      const message = await toggleTweetLike(tweetId);
+      console.log(message);
+      // Optionally update UI or liked state
     } catch (error) {
       console.error(error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
-      } else {
-        setError(error.message || 'An error occurred');
-      }
+      setError(error.message || 'An error occurred while liking the tweet.');
     }
   };
 
-  const handleTweetClick = (tweet) => {
+  const handleTweetClick = async (tweet) => {
     setSelectedTweet(tweet);
-    fetchTweetComments(tweet._id);
+    try {
+      const commentsData = await fetchTweetComments(tweet._id);
+      setComments(commentsData);
+    } catch (error) {
+      console.error(error);
+      setError(error.message || 'An error occurred while fetching comments.');
+    }
   };
 
   const handleCloseTweetCard = () => {
@@ -113,34 +58,21 @@ const Tweets = () => {
   };
 
   const handleTweetComment = async (e) => {
-    e.preventDefault(); // Prevent the default form submission
-    if (!accessToken) {
-      alert("You have to login first to comment on this tweet.");
-      return;
-    }
+    e.preventDefault();
     if (!newComment.trim()) {
       alert("Comment cannot be empty.");
       return;
     }
     try {
-      const response = await axios.post(
-        `https://backend-of-videotube.onrender.com/api/v1/comment/t/${selectedTweet._id}`,
-        { content: newComment },
-        {
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-        }
-      );
-      setComments([...comments, response.data.data.comment]);
+      const comment = await addTweetComment(selectedTweet._id, newComment);
+      setComments([...comments, comment]);
       setNewComment("");
     } catch (error) {
-      console.error(`Error posting comment for tweet ${selectedTweet._id}:`, error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
-      } else {
-        setError(error.message || 'An error occurred');
-      }
+      console.error(error);
+      setError(error.message || 'An error occurred while adding the comment.');
     }
   };
+
   const toggleShowAllComments = () => {
     setShowAllComments(!showAllComments);
   };
@@ -148,18 +80,18 @@ const Tweets = () => {
   return (
     <div className='flex items-center justify-center min-h-screen'>
       {loading ? (
-         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-transparent">
-         <div className="flex flex-row gap-2">
-           <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce"></div>
-           <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
-           <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
-         </div>
-       </div>
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-transparent">
+          <div className="flex flex-row gap-2">
+            <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce"></div>
+            <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
+            <div className="w-4 h-4 bg-blue-700 rounded-full animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
+          </div>
+        </div>
       ) : (
         <div className='flex flex-wrap w-[600px] gap-8'>
           {tweets.map(tweet => (
             <div
-              key={tweet.id}
+              key={tweet._id}
               className='w-[500px] h-[600px] bg-white shadow-lg rounded-xl p-4 cursor-pointer'
               onClick={() => handleTweetClick(tweet)}
             >
@@ -175,7 +107,7 @@ const Tweets = () => {
               <div className='flex gap-3 mt-4'>
                 <button
                   onClick={() => handleLikeButton(tweet._id)}
-                  className={`flex items-center justify-center w-12 h-12 text-xl rounded-full ${liked ? 'bg-blue-500 text-white' : 'bg-gray-100'} hover:bg-gray-200`}
+                  className="flex items-center justify-center w-12 h-12 text-xl bg-gray-100 rounded-full hover:bg-gray-200"
                 >
                   <BiLike />
                 </button>
@@ -192,8 +124,8 @@ const Tweets = () => {
       )}
 
       {selectedTweet && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
-          <div className="bg-white w-[600px] p-4  relative  h-[550px] overflow-scroll rounded-xl ">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white w-[600px] p-4 relative h-[550px] overflow-scroll rounded-xl">
             <button
               className="absolute text-2xl text-red-500 top-2 right-2"
               onClick={handleCloseTweetCard}
@@ -222,9 +154,7 @@ const Tweets = () => {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => handleLikeButton(selectedTweet._id)}
-                className={`flex items-center justify-center w-12 h-12 text-xl rounded-full ${
-                  liked ? 'bg-blue-500 text-white' : 'bg-gray-100'
-                } hover:bg-gray-200`}
+                className="flex items-center justify-center w-12 h-12 text-xl bg-gray-100 rounded-full hover:bg-gray-200"
               >
                 <BiLike />
               </button>

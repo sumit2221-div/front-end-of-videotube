@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { loginUser } from '../api/userApi'; // Import the login API function
 import { login as authLogin } from '../store/authslice';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
@@ -24,16 +24,13 @@ const Login = () => {
         throw new Error('Please fill in all fields');
       }
 
-      const response = await axios.post('https://backend-of-videotube.onrender.com/api/v1/users/login', {
-        email,
-        password,
-      });
+      // Use the centralized API service for login
+      const response = await loginUser({ email, password });
 
-      if (response.data && response.data.data) {
-        const { accessToken } = response.data.data;
-        sessionStorage.setItem('accessToken', accessToken);
+      if (response && response.accessToken) {
+        sessionStorage.setItem('accessToken', response.accessToken);
         dispatch(authLogin({ email, password }));
-        navigate("/");
+        navigate('/');
       } else {
         throw new Error('Unexpected response format');
       }

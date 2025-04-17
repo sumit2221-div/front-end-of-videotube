@@ -1,7 +1,7 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { logoutUser } from '../api/userApi'; // Import the centralized API function
 import { logout } from '../store/authslice';
 
 const LogoutButton = () => {
@@ -10,34 +10,27 @@ const LogoutButton = () => {
 
   const handleLogout = async () => {
     try {
-      const accessToken = sessionStorage.getItem('accessToken');
-      const response = await axios.post(
-        'https://backend-of-videotube.onrender.com/api/v1/users/logout',
-        null, // No data payload
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }
-      );
+      // Call the centralized API function to log out
+      await logoutUser();
 
       // Dispatch logout action
       dispatch(logout());
 
-      // Remove access token from local storage
+      // Remove access token from session storage
       sessionStorage.removeItem('accessToken');
 
-      if (response.status === 200) {
-        // Redirect to login page
-        navigate('/login');
-      }
+      // Redirect to login page
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
+      alert('Failed to log out. Please try again.');
     }
   };
 
   return (
-    <button className="text-white" onClick={handleLogout}>Logout</button>
+    <button className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600" onClick={handleLogout}>
+      Logout
+    </button>
   );
 };
 

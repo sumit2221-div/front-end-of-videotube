@@ -3,7 +3,7 @@ import LOGO from "../assets/LGO.png";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './logout';
-import axios from 'axios';
+import { fetchCurrentUser } from '../api/userApi'; // Import centralized API function
 import { MdVideoLibrary, MdOutlineWebAsset } from 'react-icons/md';
 import { BiSearch } from "react-icons/bi";
 import { IoPerson } from "react-icons/io5";
@@ -41,13 +41,8 @@ const Header = ({ onSearch }) => {
     const fetchUserAvatar = async () => {
       try {
         if (isLoggedIn) {
-          const accessToken = sessionStorage.getItem('accessToken');
-          const response = await axios.get('https://backend-of-videotube.onrender.com/api/v1/users/current-user', {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`
-            }
-          });
-          setUserAvatar(response.data.data);
+          const userData = await fetchCurrentUser(); // Use centralized API function
+          setUserAvatar(userData);
         }
       } catch (error) {
         console.error('Error fetching user avatar:', error);
@@ -58,7 +53,7 @@ const Header = ({ onSearch }) => {
     fetchUserAvatar();
   }, [isLoggedIn]);
 
-  const handleGetUserChannel = async () => {
+  const handleGetUserChannel = () => {
     const userId = userAvatar._id;
     navigate(`/user/c/${userId}`);
   };

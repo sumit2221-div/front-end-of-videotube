@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { publishVideo } from '../api/videoApi'; // Import the centralized API function
 
 const PublishVideo = () => {
   const [title, setTitle] = useState('');
@@ -11,16 +11,16 @@ const PublishVideo = () => {
   const [loading, setLoading] = useState(false); // State for loading indicator
 
   const navigate = useNavigate();
-  const accessToken = sessionStorage.getItem('accessToken');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(''); // Reset error state
+    setLoading(true); // Set loading to true when submitting form
 
     try {
-      setLoading(true); // Set loading to true when submitting form
-
+      // Validate form fields
       if (!title || !description || !thumbnail || !videofile) {
-        throw new Error("Please provide title, description, thumbnail, and video file");
+        throw new Error('Please provide title, description, thumbnail, and video file.');
       }
 
       const formData = new FormData();
@@ -29,24 +29,23 @@ const PublishVideo = () => {
       formData.append('thumbnail', thumbnail);
       formData.append('videofile', videofile);
 
-      const response = await axios.post('https://backend-of-videotube.onrender.com/api/v1/video', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${accessToken}`
-        },
-      });
+      // Use the centralized API function to publish the video
+      const response = await publishVideo(formData);
 
-      console.log('Video published successfully:', response.data);
+      console.log('Video published successfully:', response);
 
-      setLoading(false); // Set loading to false after successful upload
+      // Reset form fields after successful submission
+      setTitle('');
+      setDescription('');
+      setThumbnail(null);
+      setVideoFile(null);
 
-      if (response.data) {
-        navigate("/");
-      }
+      navigate('/'); // Redirect to the homepage
     } catch (error) {
-      console.error('Error publishing video:', error.message);
-      setErrorMessage(error.message);
-      setLoading(false); // Set loading to false if there's an error
+      console.error('Error publishing video:', error);
+      setErrorMessage(error.message || 'An error occurred while publishing the video.');
+    } finally {
+      setLoading(false); // Set loading to false after submission
     }
   };
 
@@ -70,8 +69,7 @@ const PublishVideo = () => {
           placeholder="Title"
           className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md"
         />
-        <input
-          type='text'
+        <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description"
@@ -90,7 +88,6 @@ const PublishVideo = () => {
           accept="video/*"
           className="mb-4"
         />
-      
         {loading ? (
           <button
             type="button"

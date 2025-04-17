@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { changePassword } from '../api/userApi'; // Import the centralized API function
 
 function Changepassword() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
-  const accessToken = localStorage.getItem('accessToken');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,24 +19,16 @@ function Changepassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage(''); // Reset message state
 
-    // Send request to backend with oldPassword and newPassword
     try {
-      const response = await fetch('https://backend-of-videotube.onrender.com/api/v1/users/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`, 
-        },
-        body: JSON.stringify({ oldPassword, newPassword }),
-      });
-      const data = await response.json();
-      setMessage(data.message);
-      navigate("/login")
-
+      // Use the centralized API function to change the password
+      const responseMessage = await changePassword({ oldPassword, newPassword });
+      setMessage(responseMessage); // Set success message
+      navigate('/login'); // Redirect to login page after successful password change
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('An error occurred, please try again later.');
+      console.error('Error changing password:', error);
+      setMessage(error.message || 'An error occurred, please try again later.');
     }
   };
 
