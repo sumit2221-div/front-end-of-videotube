@@ -3,14 +3,14 @@ import LOGO from "../assets/LGO.png";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from './logout';
-import { fetchCurrentUser } from '../api/userApi'; // Import centralized API function
+import { getCurrentUser} from '../api/userApi'; // Import centralized API function
 import { MdVideoLibrary, MdOutlineWebAsset } from 'react-icons/md';
 import { BiSearch } from "react-icons/bi";
 import { IoPerson } from "react-icons/io5";
 
 const Header = ({ onSearch }) => {
   const [query, setQuery] = useState("");
-  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn || sessionStorage.getItem('accessToken'));
   const navigate = useNavigate();
   const [userAvatar, setUserAvatar] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -41,8 +41,9 @@ const Header = ({ onSearch }) => {
     const fetchUserAvatar = async () => {
       try {
         if (isLoggedIn) {
-          const userData = await fetchCurrentUser(); // Use centralized API function
-          setUserAvatar(userData);
+          const userData = await getCurrentUser(); // Fetch user data using centralized API function
+          setUserAvatar(userData.data.data ); 
+          console.log('User Avatar:', userData.data.data._id);
         }
       } catch (error) {
         console.error('Error fetching user avatar:', error);

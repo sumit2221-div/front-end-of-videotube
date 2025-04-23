@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchSubscriptionVideos } from '../api/videoApi'; // Import API for fetching subscription videos
+import {fetchSubscriberVideos } from '../api/videoApi'; // Import API for fetching subscription videos
 import { getUserById } from '../api/userApi'; // Import API for fetching user data
 import VideoCard from '../components/videocard';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,7 @@ const SubscriptionVideos = () => {
     const fetchVideos = async () => {
       try {
         // Fetch subscription videos using the centralized API
-        const videos = await fetchSubscriptionVideos();
+        const videos = await fetchSubscriberVideos();
 
         // Fetch owner data for each video
         const videosWithOwnerData = await Promise.all(

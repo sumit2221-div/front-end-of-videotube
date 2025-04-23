@@ -32,6 +32,8 @@ const PublishVideo = () => {
       // Use the centralized API function to publish the video
       const response = await publishVideo(formData);
 
+      
+
       console.log('Video published successfully:', response);
 
       // Reset form fields after successful submission

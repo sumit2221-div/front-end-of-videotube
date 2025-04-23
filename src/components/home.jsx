@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchAllVideos } from "../api/videoApi"; // Import the API function
-import { fetchUserById } from "../api/userApi"; // Import user API function
+import { getUserById } from "../api/userApi"; // Import user API function
 import VideoCard from "./videocard";
 import ErrorPage from "./errorbox";
 import { BiArrowBack, BiArrowToRight } from "react-icons/bi";
@@ -28,20 +28,22 @@ const Home = ({ searchQuery }) => {
         search: searchQuery,
       });
 
-      // Fetch owner data for each video
-      const videosWithOwnerData = await Promise.all(
+      console.log(response.videos);
+
+      // Fetch owner details for each video
+      const videosWithOwner = await Promise.all(
         response.videos.map(async (video) => {
-          try {
-            const ownerData = await fetchUserById(video.owner);
-            return { ...video, owner: ownerData };
-          } catch (error) {
-            console.error(`Error fetching owner data for video ${video.id}:`, error);
-            return video;
-          }
+          const ownerResponse = await getUserById(video.owner); // Fetch owner details using owner ID
+          return {
+            ...video,
+            ownerDetails: ownerResponse.data, // Add owner details to the video object
+          };
         })
       );
 
-      setVideos(videosWithOwnerData);
+      // Set videos with owner details
+      setVideos(videosWithOwner);
+      console.log(videosWithOwner);
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error("Error fetching videos:", error);
@@ -64,7 +66,9 @@ const Home = ({ searchQuery }) => {
   };
 
   if (loading) {
-    return <FullScreenLoader />;
+    return <>
+    <h1>loading</h1>
+    </>
   }
 
   if (error) {

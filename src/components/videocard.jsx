@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 const VideoCard = ({ video }) => {
   const getTimeDifference = (createdAt) => {
     if (!createdAt) return 'Unknown date';
-    
+
     const now = new Date();
     const createdAtDate = new Date(createdAt);
     if (isNaN(createdAtDate)) return 'Invalid date';
-    
+
     const difference = now - createdAtDate;
     const seconds = Math.floor(difference / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -48,12 +48,12 @@ const VideoCard = ({ video }) => {
         <div className="w-full p-4 text-white bg-transparent h-[90px] flex items-center">
           <img
             className="h-[50px] w-[50px] rounded-full"
-            src={video.owner.avatar}
-            alt={`Avatar of ${video.owner.username}`}
+            src={video.ownerDetails?.data.avatar}
+            alt={`Avatar of ${video.ownerDetails?.data.username}`}
           />
-          <div className='flex flex-col ml-4'>
+          <div className="flex flex-col ml-4">
             <h4 className="text-lg font-semibold">{video.title}</h4>
-            <h3 className="text-sm text-gray-400">{video.owner.username}</h3>
+            <h3 className="text-sm text-gray-400">{video.ownerDetails?.data.username || 'Unknown User'}</h3>
             <h4 className="text-sm text-gray-400">{timeDifference}</h4>
           </div>
         </div>

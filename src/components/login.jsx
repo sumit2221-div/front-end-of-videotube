@@ -26,10 +26,25 @@ const Login = () => {
 
       // Use the centralized API service for login
       const response = await loginUser({ email, password });
+      console.log(response.data);
 
-      if (response && response.accessToken) {
-        sessionStorage.setItem('accessToken', response.accessToken);
+      if (response) {
+        // Store accessToken and refreshToken in sessionStorage
+        const accessToken = response.data.data.accessToken;
+        const refreshToken = response.data.data.refreshToken;
+
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
+
+        // Check if the accessToken is stored successfully
+        if (!sessionStorage.getItem('accessToken')) {
+          throw new Error('Failed to store access token. Please try again.');
+        }
+
+        // Dispatch login action to Redux store
         dispatch(authLogin({ email, password }));
+
+        // Navigate to the home page
         navigate('/');
       } else {
         throw new Error('Unexpected response format');

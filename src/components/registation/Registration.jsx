@@ -51,7 +51,8 @@ const Registration = () => {
       // Use the centralized API function to register the user
       const responseMessage = await registerUser(formData);
       console.log(responseMessage);
-      navigate('/Login'); // Redirect to login page after successful registration
+      navigate('/Login');
+      console.log('User registered successfully:', responseMessage);
     } catch (error) {
       console.error('Error registering user:', error);
       setErrorMessage(error.message || 'An error occurred during registration. Please try again.');

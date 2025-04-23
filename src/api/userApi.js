@@ -61,7 +61,3 @@ export const getUserChannelProfile = (userId) => {
   return axiosInstance.get(`/users/c/${userId}`);
 };
 
-// Get watch history
-export const getWatchHistory = () => {
-  return axiosInstance.get('/users/v/history');
-};

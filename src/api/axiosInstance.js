@@ -5,6 +5,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Allow credentials (cookies) to be sent with requests
 });
 
 // Add an interceptor to include the access token in every request

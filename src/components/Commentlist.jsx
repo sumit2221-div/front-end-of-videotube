@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchCurrentUser, getUserById } from '../api/userApi'; // Import centralized user APIs
+import { getCurrentUser, getUserById } from '../api/userApi'; // Import centralized user APIs
 import { deleteComment } from '../api/commentApi'; // Import centralized comment API
 import { FiMoreVertical, FiEdit2 } from "react-icons/fi";
 import { MdDelete } from "react-icons/md";
@@ -13,7 +13,7 @@ const CommentList = ({ comments }) => {
   useEffect(() => {
     const fetchCurrentUserData = async () => {
       try {
-        const currentUser = await fetchCurrentUser(); // Fetch current user using centralized API
+        const currentUser = await getCurrentUser(); // Fetch current user using centralized API
         setCurrentUserId(currentUser._id);
       } catch (error) {
         console.error('Error fetching current user data:', error);

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BiLike, BiComment, BiShare } from 'react-icons/bi';
 import { GoX } from "react-icons/go";
-import { fetchAllTweets, toggleTweetLike } from '../api/tweetApi'; // Import tweet-related APIs
+import { fetchAllTweets } from '../api/tweetApi'; // Import tweet-related APIs
 import { fetchTweetComments, addTweetComment } from '../api/commentApi'; // Import comment-related APIs
+import { toggleTweetLike } from '../api/likeApi'; // Import like-related APIs
 
 const Tweets = () => {
   const [tweets, setTweets] = useState([]);

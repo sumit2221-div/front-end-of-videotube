@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike, AiOutlineWhatsApp } from "react-icons/ai";
 import CommentList from './Commentlist';
-import { fetchVideoById, fetchLikesByVideoId, toggleLike } from '../api/videoApi'; // Centralized video APIs
-import { fetchCommentsByVideoId, addComment } from '../api/commentApi'; // Centralized comment APIs
-import { fetchUserById, fetchCurrentUser } from '../api/userApi'; // Centralized user APIs
-import { subscribeToChannel } from '../api/subscriptionApi'; // Centralized subscription API
+import { fetchVideoById } from '../api/videoApi'; // Centralized video APIs
+import { fetchVideoComments,  addVideoComment } from '../api/commentApi'; // Centralized comment APIs
+import {fetchLikedVideos, toggleVideoLike} from '../api/likeApi'; // Centralized like APIs
+import { getUserById,getCurrentUser } from '../api/userApi'; // Centralized user APIs
+import { toggleSubscription } from '../api/subscriptionApi'; // Centralized subscription API
 
 const VideoPlayer = () => {
   const [video, setVideo] = useState(null);
@@ -29,30 +30,36 @@ const VideoPlayer = () => {
       try {
         // Fetch video details
         const videoData = await fetchVideoById(id);
-        setVideo(videoData);
+        console.log("Video Data:", videoData); // Log video details
+        setVideo(videoData.video);
         setLiked(videoData.likestatus);
         setIsSubscribed(videoData.isSubscriber);
 
         // Fetch owner details
-        const ownerData = await fetchUserById(videoData.owner);
-        setOwner(ownerData);
+        const ownerData = await getUserById(videoData.video.owner);
+        console.log("Owner Data:", ownerData.data); // Log owner details
+        setOwner(ownerData.data.data);
 
         // Fetch comments
-        const commentsData = await fetchCommentsByVideoId(id);
+        const commentsData = await fetchVideoComments(id);
+        console.log("Comments Data:", commentsData); // Log comments
         setComments(commentsData);
 
         // Fetch current user details
-        const currentUser = await fetchCurrentUser();
+        const currentUser = await getCurrentUser();
+        console.log("Current User Data:", currentUser); // Log current user details
         setUserAvatar(currentUser.avatar);
 
         // Fetch likes and dislikes
-        const likesData = await fetchLikesByVideoId(id);
+        const likesData = await fetchLikedVideos(id);
+        console.log("Likes Data:", likesData); // Log likes and dislikes
         setLikes(likesData.totalLikes);
 
         // Fetch subscriber count
+        console.log("Subscriber Count:", ownerData.subscribersCount); // Log subscriber count
         setSubscriberCount(ownerData.subscribersCount);
       } catch (error) {
-        console.error('Error fetching video data:', error);
+        console.error("Error fetching video data:", error);
       }
     };
 
@@ -61,7 +68,7 @@ const VideoPlayer = () => {
 
   const handleLikeToggle = async () => {
     try {
-      await toggleLike(id);
+      await toggleVideoLike(id);
       setLiked(!liked);
       setDisliked(false); // Reset dislike state
       setLikes((prev) => (liked ? prev - 1 : prev + 1));
@@ -84,7 +91,7 @@ const VideoPlayer = () => {
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     try {
-      await addComment(id, newComment);
+      await addVideoComment(id, newComment);
       setNewComment('');
       setIsInputFocused(false);
 
@@ -98,7 +105,7 @@ const VideoPlayer = () => {
 
   const handleSubscribe = async () => {
     try {
-      await subscribeToChannel(owner._id);
+      await toggleSubscription(owner._id);
       setIsSubscribed(true);
       setSubscriberCount((prev) => prev + 1);
     } catch (error) {
